@@ -1,0 +1,41 @@
+Then eto po yung mga gusto po naming ipagawa:
+
+Features of the Admin Website:
+
+1. Authentication (Admin login) (DONE) -------->
+2. Dashboard - An overview of hotel metrics like bookings, availability, revenue, etc.
+3. Room Management - Admins can add, update, or remove rooms, and manage room categories, prices, availability, and photos. (DONE) ------>
+4. Booking Management - View, update, or cancel bookings, and Filter bookings by date, room type, or guest. (DONE) ------>
+6. Staff Management - (Please make some suggestions about this.) (DONE) ------>
+7. Reports - View reports on bookings, revenue, and customer activity. You could also add a generate a PDF Report Function that takes all the data from each tables. 
+
+Reservations Updates:
+1. The buttons should stay permanent in color right after clicking the status of the certain reservations. (REMOVE) ------>
+2. Add a Generate Report button that will generate all of the report that the users set at the filter. (REMOVE) ------>
+3. The filter of the Generate report  should contain who check in, who checked out, who paid, and who canceled. (REMOVE) ------>
+ 
+Staff Managements Updates:
+1. The users should be able to see what kinds of rooms to clean.
+2. Add a Generate Report button that will generate all of the report that the users set at the filter.
+3. Add a schedule management function/button.
+
+Room Management Updates:
+1. Finalize all of the details of the rooms, the room types, prices. (DONE) ------>
+2. Put all of the details, contents, and amenities of the rooms. (DONE) ------>
+
+Booking Updates:
+1. Add a Billings Button, it should contain all of the billings/receipt of the Guest. (REMOVE) ------>
+2. Reposition all of the buttons at the top of table, and it's title. (REMOVE) ------>
+
+Inventory Updates:
+1. When a certain stock items reach the quantity of 50 and below the status should change into a "low stock".
+2. When a certain stock reach the quantity of 100 and above the status should change into In "stock".
+It should notify the users at the Notifications of the website when a certain stock reaches "low stock".
+
+Additional Notes*
+-Header of the table fixed at the screen (DONE) ------>
+
+about us
+
+Welcome to the Best Fortune Hotel, a 2-star accommodation conveniently located in the heart of Manila, Philippines. Offering excellent amenities and a comfortable stay, it's perfect for both business and leisure travelers. Built in 1997, the hotel boasts 90 well-appointed rooms and top-notch service.
+Located just 0.7 km from the city center and 45 minutes from the airport, it provides easy access to Manila's attractions. Check-in starts at 2 PM, and check-out is until 12 PM. The hotel is family-friendly, offering free stays for children aged 0 to 6. Book your stay today and experience the best of Manila.
