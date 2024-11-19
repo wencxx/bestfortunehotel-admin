@@ -1,11 +1,12 @@
 import { defineStore } from 'pinia'
 import { db } from '../config/firebaseConfig'
-import { onSnapshot, collection } from 'firebase/firestore'
+import { onSnapshot, collection, addDoc, getDocs, query, where } from 'firebase/firestore'
 
 export const useDataStore = defineStore('dataStore', {
     state: () => ({
         bookings: [],
-        staffs: []
+        staffs: [],
+        notifications: []
     }),
     actions: {
         async getBookings() {
@@ -23,6 +24,7 @@ export const useDataStore = defineStore('dataStore', {
                     }
                 )
                 this.getStaffs()
+                this.addRoomsToClean()
             } catch (error) {
                 console.log('Failed to get bookings')
             }
@@ -44,7 +46,56 @@ export const useDataStore = defineStore('dataStore', {
             } catch (error) {
                 console.log('Failed to get bookings')
             }
+        },
+        async getNotifications() {
+            try {
+                onSnapshot(
+                    collection(db, 'notifications'),
+                    (snapshot) => {
+                        this.notifications = []
+                        snapshot.docs.forEach(doc => {
+                            this.notifications.push({
+                                id: doc.id,
+                                ...doc.data()
+                            })
+                        })
+                    }
+                )
+            } catch (error) {
+                console.log('Failed to get notifications')
+            }
+        },
+        async addRoomsToClean() {
+            try {
+                const today = new Date().toISOString().split('T')[0]; 
+                const roomsToCleanCollection = collection(db, 'roomsToClean');
+        
+                for (const booking of this.bookings) {
+                    const checkOutDate = booking.checkOut;
+        
+                    if (checkOutDate === today && booking.status === 'confirmed') {
+                        const querySnapshot = await getDocs(
+                            query(
+                                roomsToCleanCollection, 
+                                where('roomName', '==', booking.roomName),
+                                where('checkOutDate', '==', booking.checkOut)
+                            )
+                        );
+        
+                        if (querySnapshot.empty) {
+                            await addDoc(roomsToCleanCollection, {
+                                roomName: booking.roomName,
+                                checkOutDate: booking.checkOut,
+                                cleaned: false
+                            });
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to add rooms to clean:', error);
+            }
         }
+        
     },
     getters: {
         confirmedBookings(state){

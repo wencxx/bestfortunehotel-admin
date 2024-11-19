@@ -18,9 +18,25 @@ const routes = [
         }
     },
     {
+        path: '/notifications',
+        name: 'notifications',
+        component: () => import('../views/Notifications.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
+    {
         path: '/rooms',
         name: 'rooms',
         component: () => import('../views/Rooms.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
+    {
+        path: '/promos',
+        name: 'promos',
+        component: () => import('../views/Promos.vue'),
         meta: {
             requiresAuth: true
         }
@@ -37,6 +53,22 @@ const routes = [
         path: '/staffs',
         name: 'staffs',
         component: () => import('../views/Staffs.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
+    {
+        path: '/rooms-to-clean',
+        name: 'roomsToClean',
+        component: () => import('../views/RoomsToClean.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
+    {
+        path: '/inventory',
+        name: 'inventory',
+        component: () => import('../views/Inventory.vue'),
         meta: {
             requiresAuth: true
         }

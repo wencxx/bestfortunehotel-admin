@@ -3,11 +3,11 @@ Then eto po yung mga gusto po naming ipagawa:
 Features of the Admin Website:
 
 1. Authentication (Admin login) (DONE) -------->
-2. Dashboard - An overview of hotel metrics like bookings, availability, revenue, etc.
+2. Dashboard - An overview of hotel metrics like bookings, availability, revenue, etc. (DONE) ------>
 3. Room Management - Admins can add, update, or remove rooms, and manage room categories, prices, availability, and photos. (DONE) ------>
 4. Booking Management - View, update, or cancel bookings, and Filter bookings by date, room type, or guest. (DONE) ------>
 6. Staff Management - (Please make some suggestions about this.) (DONE) ------>
-7. Reports - View reports on bookings, revenue, and customer activity. You could also add a generate a PDF Report Function that takes all the data from each tables. 
+7. Reports - View reports on bookings, revenue, and customer activity. You could also add a generate a PDF Report Function that takes all the data from each tables. (DONE) ------> 
 
 Reservations Updates:
 1. The buttons should stay permanent in color right after clicking the status of the certain reservations. (REMOVE) ------>
