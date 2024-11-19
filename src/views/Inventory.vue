@@ -23,9 +23,10 @@
                     <option>Low Stock</option>
                 </select>
                 <input type="text" placeholder="Search" class="border rounded pl-2 ml-auto" v-model="searchQuery">
+                <button class="bg-green-500 text-white px-3 rounded" @click="generateCSV">Generate CSV</button>
             </div>
             <div class="full overflow-x-auto">
-                <table class="w-full rounded-md overflow-hidden">
+                <table class="w-full rounded-md overflow-hidden" id="inventoryTable">
                     <thead class="bg-custom-primary text-white">
                         <tr>
                             <th class="border w-2/5 py-2">Item</th>
@@ -221,4 +222,34 @@ watch(
   { immediate: true, deep: true }
 );
 
+
+// generate csv
+const generateCSV = () => {
+    let table = document.getElementById('inventoryTable');
+    let rows = table.querySelectorAll('tr');
+    let csvContent = '';
+
+    rows.forEach((row) => {
+        let rowData = [];
+        let cols = row.querySelectorAll('td:not(:last-child), th:not(:last-child)'); 
+
+        cols.forEach((col) => {
+            let cellText = col.innerText.trim();
+            rowData.push(`"${cellText.replace(/"/g, '""')}"`);
+        });
+
+        if (rowData.length > 0) {
+            csvContent += rowData.join(',') + '\n';
+        }
+    });
+
+    let blob = new Blob([csvContent], { type: 'text/csv' });
+    let link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'Inventory.csv';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+};
 </script>

@@ -23,20 +23,21 @@
                     <option>Occupied</option>
                 </select>
                 <input type="text" placeholder="Search" class="border rounded pl-2 ml-auto" v-model="searchQuery">
+                <button class="bg-green-500 text-white px-3 rounded" @click="generateCSV">Generate CSV</button>
             </div>
             <div class="full overflow-x-auto">
-                <table class="w-[120%] rounded-md overflow-hidden">
+                <table class="w-[120%] rounded-md overflow-hidden" id="roomsTable">
                     <thead class="bg-custom-primary text-white">
                         <tr>
-                            <th class="border w-fit py-2">Room Name</th>
-                            <th class="border w-fit py-2">Price</th>
-                            <th class="border w-fit py-2">Capacity</th>
-                            <th class="border w-fit py-2">Room Size</th>
-                            <th class="border w-fit py-2">Bed</th>
-                            <th class="border w-fit py-2">Bathroom</th>
-                            <th class="border w-fit py-2">Key Features</th>
-                            <th class="border w-fit py-2">Status</th>
-                            <th class="border w-fit py-2">Action</th>
+                            <th class="border w-2/12 py-2">Room Name</th>
+                            <th class="border w-1/12 py-2">Price</th>
+                            <th class="border w-1/12 py-2">Capacity</th>
+                            <th class="border w-1/12 py-2">Room Size</th>
+                            <th class="border w-1/12 py-2">Bed</th>
+                            <th class="border w-1/12 py-2">Bathroom</th>
+                            <th class="border w-3/12 py-2">Key Features</th>
+                            <th class="border w-1/12 py-2">Status</th>
+                            <th class="border w-1/12 py-2">Action</th>
                         </tr>
                     </thead>
                     <tbody v-if="filteredRoom()?.length">
@@ -47,9 +48,9 @@
                             <td class="border-x text-center py-2 capitalize">{{ room.roomSize }}</td>
                             <td class="border-x text-center py-2 capitalize">{{ room.roomBed }}</td>
                             <td class="border-x text-center py-2 capitalize">{{ room.roomBathroom }}</td>
-                            <td class="border-x text-center py-2">{{ room.roomKeyFeatures || 'N/A' }}</td>
-                            <td class="border-x text-center p-1 capitalize">
-                                <button class="bg-green-500 px-2 text-white w-3/4 capitalize rounded py-1 text-sm" :class="{ 'bg-orange-500': !room.isAvailable }">{{ room.isAvailable ? 'available' : 'occupied' }}</button>
+                            <td class="border-x text-center py-2"><span class="line-clamp-3">{{ room.roomKeyFeatures || 'N/A' }}</span></td>
+                            <td class="border-x text-center p-1 capitalize px-2">
+                                <button class="bg-green-500 px-2 text-white w-full capitalize rounded py-1 text-sm" :class="{ 'bg-orange-500': !room.isAvailable }">{{ room.isAvailable ? 'available' : 'occupied' }}</button>
                             </td>
                             <td class="border-x text-center py-2">
                                 <div class="flex items-center gap-x-2 justify-center text-xl">
@@ -195,4 +196,35 @@ const confirmDelete = async () => {
         $toast.error('Failed to delete room')
     }
 }
+
+// generate csv
+const generateCSV = () => {
+    let table = document.getElementById('roomsTable');
+    let rows = table.querySelectorAll('tr');
+    let csvContent = '';
+
+    rows.forEach((row) => {
+        let rowData = [];
+        let cols = row.querySelectorAll('td:not(:last-child), th:not(:last-child)'); 
+
+        cols.forEach((col) => {
+            let cellText = col.innerText.trim();
+            rowData.push(`"${cellText.replace(/"/g, '""')}"`);
+        });
+
+        if (rowData.length > 0) {
+            csvContent += rowData.join(',') + '\n';
+        }
+    });
+
+    let blob = new Blob([csvContent], { type: 'text/csv' });
+    let link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'Rooms.csv';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+};
+
 </script>

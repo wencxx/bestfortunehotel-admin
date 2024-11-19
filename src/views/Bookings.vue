@@ -22,10 +22,11 @@
                     <option>Declined</option>
                 </select>
                 <input type="text" placeholder="Search" class="border rounded pl-2 ml-auto" v-model="searchQuery">
+                <button class="bg-green-500 text-white px-3 rounded" @click="generateCSV">Generate CSV</button>
                 <!-- <button class="bg-blue-500 px-3 rounded text-white" @click="generateReport">Generate Report</button> -->
             </div>
             <div class="w-full overflow-x-auto">
-                <table class="w-[170%] rounded-md overflow-hidden">
+                <table class="w-[170%] rounded-md overflow-hidden" id="bookingsTable">
                     <thead class="bg-custom-primary text-white">
                         <tr>
                             <th class="border w-fit py-2">Name</th>
@@ -221,34 +222,34 @@ const deleteBooking = async () => {
     }
 }
 
-// generate report
-const generateReport = () => {
-    const doc = new jsPDF()
-    
-    const columns = ["Name", "Booking Id", "GCASH Reference", "Room Name", "Guests", "Check In", "Check Out", "Days", "Add Ons", "Total Price", "Status"]
-    const rows = filteredBookings().map(booking => [
-        `${booking.firstName} ${booking.lastName}`,
-        booking.id,
-        booking.referenceNumber,
-        booking.roomName,
-        booking.guests,
-        formatDate(booking.checkIn),
-        formatDate(booking.checkOut),
-        booking.days,
-        booking.beds || 0,
-        formatCurrency(booking.totalPrice),
-        booking.status
-    ])
-    
-    doc.autoTable({
-        head: [columns],
-        body: rows,    
-        headStyles: {
-            fillColor: '#cb2107', 
-        },
-    })
+// generate csv
+const generateCSV = () => {
+    let table = document.getElementById('bookingsTable');
+    let rows = table.querySelectorAll('tr');
+    let csvContent = '';
 
-    doc.save("booking-report.pdf")
-}
+    rows.forEach((row) => {
+        let rowData = [];
+        let cols = row.querySelectorAll('td:not(:last-child), th:not(:last-child)'); 
+
+        cols.forEach((col) => {
+            let cellText = col.innerText.trim();
+            rowData.push(`"${cellText.replace(/"/g, '""')}"`);
+        });
+
+        if (rowData.length > 0) {
+            csvContent += rowData.join(',') + '\n';
+        }
+    });
+
+    let blob = new Blob([csvContent], { type: 'text/csv' });
+    let link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'Bookings.csv';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+};
 
 </script>
