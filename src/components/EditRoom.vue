@@ -1,7 +1,7 @@
 <template>
     <div class="fixed w-screen h-screen bg-black/30 top-0 left-0 !mt-0 flex items-center justify-center">
         <form @submit.prevent="updateRoom" class="bg-white rounded-md w-full max-w-xl h-fit border p-5 grid grid-cols-2 gap-5">
-            <h1 class="text-xl text-center font-medium col-span-2">Update Room</h1>
+            <h1 class="text-xl text-center font-medium col-span-2">Update Room Type</h1>
             <div v-if="passImageLimit" class="col-span-2">
                 <p class="bg-red-500 text-white pl-2 py-1 rounded">Exceed images uploads</p>
             </div>
@@ -9,7 +9,7 @@
                 <p class="bg-red-500 text-white pl-2 py-1 rounded">Failed adding room</p>
             </div>
             <div class="flex flex-col gap-y-1">
-                <label >Room Name <span class="text-custom-primary">*</span></label>
+                <label >Room Type<span class="text-custom-primary">*</span></label>
                 <input type="text" class="border rounded pl-2 h-8" v-model="roomDetails.roomName">
             </div>
             <div class="flex flex-col gap-y-1">
@@ -44,13 +44,13 @@
                 <label>Room Bathroom <span class="text-custom-primary">*</span></label>
                 <input type="text" class="border rounded pl-2 h-8" v-model="roomDetails.roomBathroom">
             </div>
-             <div class="flex flex-col gap-y-1">
+            <!-- <div class="flex flex-col gap-y-1">
                 <label>Availability <span class="text-custom-primary">*</span></label>
                 <select v-model="roomDetails.isAvailable" class="border rounded pl-2 h-8">
                     <option :value="true">Available</option>
                     <option :value="false">Occupied</option>
                 </select>
-            </div>
+            </div> -->
             <div class="flex flex-col gap-y-1 col-span-2">
                 <label>Room Key Features <span class="text-custom-primary">*</span></label>
                 <textarea class="border rounded min-h-20 p-2" v-model="roomDetails.roomKeyFeatures"></textarea>
@@ -90,7 +90,7 @@ const roomDetails = ref({
     roomBed: roomDetailsToEdit.roomBed || '',
     roomBathroom: roomDetailsToEdit.roomBathroom || '',
     roomKeyFeatures: roomDetailsToEdit.roomKeyFeatures || '',
-    isAvailable: roomDetailsToEdit.isAvailable,
+    // isAvailable: roomDetailsToEdit.isAvailable,
 })
 
 const updateRoom = async () => {

@@ -2,7 +2,7 @@
     <div class="p-20 !pt-14 space-y-10">
         <div class="flex gap-x-2 items-center">
             <Icon icon="material-symbols-light:bedroom-child-outline" class="text-4xl" />
-            <h1 class="text-xl">Room Lists</h1>
+            <h1 class="text-xl">Room Type Lists</h1>
         </div>
         <div class="flex">
             <button class="ml-auto border border-custom-primary text-custom-primary px-3 py-1 rounded hover:shadow-md" @click="willAddRoom = true">Add Room</button>
@@ -17,11 +17,11 @@
                     <option value="50">50 Rows</option>
                     <option value="100">100 Rows</option>
                 </select>
-                <select class="border py-1 px-3 rounded" v-model="filterSelect">
+                <!-- <select class="border py-1 px-3 rounded" v-model="filterSelect">
                     <option value="">All</option>
                     <option>Available</option>
                     <option>Occupied</option>
-                </select>
+                </select> -->
                 <input type="text" placeholder="Search" class="border rounded pl-2 ml-auto" v-model="searchQuery">
                 <button class="bg-green-500 text-white px-3 rounded" @click="generateCSV">Generate CSV</button>
             </div>
@@ -29,14 +29,13 @@
                 <table class="w-[120%] rounded-md overflow-hidden" id="roomsTable">
                     <thead class="bg-custom-primary text-white">
                         <tr>
-                            <th class="border w-2/12 py-2">Room Name</th>
+                            <th class="border w-2/12 py-2">Room Type</th>
                             <th class="border w-1/12 py-2">Price</th>
                             <th class="border w-1/12 py-2">Capacity</th>
                             <th class="border w-1/12 py-2">Room Size</th>
                             <th class="border w-1/12 py-2">Bed</th>
                             <th class="border w-1/12 py-2">Bathroom</th>
                             <th class="border w-3/12 py-2">Key Features</th>
-                            <th class="border w-1/12 py-2">Status</th>
                             <th class="border w-1/12 py-2">Action</th>
                         </tr>
                     </thead>
@@ -49,9 +48,6 @@
                             <td class="border-x text-center py-2 capitalize">{{ room.roomBed }}</td>
                             <td class="border-x text-center py-2 capitalize">{{ room.roomBathroom }}</td>
                             <td class="border-x text-center py-2"><span class="line-clamp-3">{{ room.roomKeyFeatures || 'N/A' }}</span></td>
-                            <td class="border-x text-center p-1 capitalize px-2">
-                                <button class="bg-green-500 px-2 text-white w-full capitalize rounded py-1 text-sm" :class="{ 'bg-orange-500': !room.isAvailable }">{{ room.isAvailable ? 'available' : 'occupied' }}</button>
-                            </td>
                             <td class="border-x text-center py-2">
                                 <div class="flex items-center gap-x-2 justify-center text-xl">
                                     <Icon icon="mdi:pencil" class="text-green-500" @click="editRoom(room, index)" />

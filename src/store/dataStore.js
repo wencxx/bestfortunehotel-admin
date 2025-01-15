@@ -6,7 +6,8 @@ export const useDataStore = defineStore('dataStore', {
     state: () => ({
         bookings: [],
         staffs: [],
-        notifications: []
+        notifications: [],
+        items: [],
     }),
     actions: {
         async getBookings() {
@@ -24,6 +25,7 @@ export const useDataStore = defineStore('dataStore', {
                     }
                 )
                 this.getStaffs()
+                this.getItems()
                 this.addRoomsToClean()
             } catch (error) {
                 console.log('Failed to get bookings')
@@ -45,6 +47,24 @@ export const useDataStore = defineStore('dataStore', {
                 )
             } catch (error) {
                 console.log('Failed to get bookings')
+            }
+        },
+        async getItems(){
+            try {
+                onSnapshot(
+                    collection(db, 'items'),
+                    (snapshot) => {
+                        this.items = []
+                        snapshot.docs.forEach(doc => {
+                            this.items.push({
+                                id: doc.id,
+                                ...doc.data()
+                            })
+                        })
+                    }
+                )
+            } catch (error) {
+                console.log(error)
             }
         },
         async getNotifications() {
@@ -99,7 +119,11 @@ export const useDataStore = defineStore('dataStore', {
     },
     getters: {
         confirmedBookings(state){
-            return state.bookings.filter(booking => booking.status === 'confirmed')
+            const currentYear = new Date().getFullYear();
+            return state.bookings.filter(booking => {
+                const bookingYear = booking.bookedAt.toDate().getFullYear();
+                return booking.status === 'confirmed' && bookingYear === currentYear;
+            });
         },
         todaysConfirmedBookings(state){
             const today = new Date().toLocaleString().split(',')[0]

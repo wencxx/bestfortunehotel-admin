@@ -32,7 +32,7 @@
                     <tbody v-if="filteredPromos()?.length">
                         <tr v-for="(promo, index) in filteredPromos()" :key="promo.id" :class="{ 'bg-gray-100': index % 2 === 0 }" class="border-b">
                             <td class="border-x text-center py-2 capitalize px-2"><span class="line-clamp-3">{{ promo.description }}</span></td>
-                            <td class="border-x text-center py-2 capitalize px-2"><span class="line-clamp-3">{{ promo.imagesUrls.length }} Attachments</span></td>
+                            <td class="border-x text-center py-2 capitalize px-2"><span class="line-clamp-3 cursor-pointer" @click="showImages(promo.imagesUrls)">{{ promo.imagesUrls.length }} Attachments</span></td>
                             <td class="border-x text-center py-2 capitalize">{{ moment(promo.end).format('LL') }}</td>
                             <td class="border-x text-center py-2">
                                 <div class="flex items-center gap-x-2 justify-center text-xl">
@@ -54,6 +54,7 @@
         <AddPromo v-if="willAddPromo" @closeModal="closeModal" />
         <EditPromo v-if="willEditPromo" @closeModal="closeEditModal" :promoDetailsToEdit="promoToEditDetails" />
         <DeleteModal v-if="willDeletePromo" :type="'Promo'" @closeModal="willDeletePromo = false" @accept="confirmDelete" />
+        <ImagesDisplayModal v-if="showImagesDisplayModal" :images="imagesToShow" @closeModal="closeShowImagesModal" />
     </div>
 </template>
 
@@ -61,6 +62,7 @@
 import AddPromo from '../components/AddPromo.vue'
 import EditPromo from '../components/EditPromo.vue'
 import DeleteModal from '../components/DeleteModal.vue'
+import ImagesDisplayModal from '../components/ImagesDisplay.vue'
 import { onMounted, ref } from 'vue'
 import { db } from '../config/firebaseConfig'
 import { collection, getDocs, doc, deleteDoc } from 'firebase/firestore'
@@ -164,5 +166,18 @@ const confirmDelete = async () => {
     } catch (error) {
         $toast.error('Failed to delete promo')
     }
+}
+
+const imagesToShow = ref([])
+const showImagesDisplayModal = ref(false)
+
+const showImages = (images) => {
+    imagesToShow.value = images
+    showImagesDisplayModal.value = true
+}
+
+const closeShowImagesModal = () => {
+    showImagesDisplayModal.value =  false
+    imagesToShow.value = []
 }
 </script>

@@ -8,7 +8,7 @@
                             <Icon icon="majesticons:book-line" class="text-3xl text-neutral-800" />
                         </div>
                         <div class="space-y-4">
-                            <h2 class="text-gray-500 text-xl uppercase">Total Bookings</h2>
+                            <h2 class="text-gray-500 text-xl uppercase">Annual Bookings</h2>
                             <h1 class="font-bold text-2xl">{{ Number(confirmedBookings.length).toLocaleString() }}</h1>
                         </div>
                     </div>
@@ -17,7 +17,7 @@
                             <Icon icon="mdi:person-group-outline" class="text-3xl text-neutral-800" />
                         </div>
                         <div class="space-y-4">
-                            <h2 class="text-gray-500 text-xl uppercase">Total Guests</h2>
+                            <h2 class="text-gray-500 text-xl uppercase">Annual Guests</h2>
                             <h1 class="font-bold text-2xl">{{ Number(totalGuests).toLocaleString() }}</h1>
                         </div>
                     </div>
@@ -26,7 +26,7 @@
                             <Icon icon="mdi:user" class="text-3xl text-neutral-800" />
                         </div>
                         <div class="space-y-4">
-                            <h2 class="text-gray-500 text-xl uppercase">Total Revenue</h2>
+                            <h2 class="text-gray-500 text-xl uppercase">Annual Revenue</h2>
                             <h1 class="font-bold text-2xl">{{ formatCurrency(totalRevenue) }}</h1>
                         </div>
                     </div>
@@ -55,7 +55,7 @@
                 </div>
                 <!-- table -->
                 <div class="p-10 bg-white rounded-xl border space-y-3">
-                    <h1 class="font-medium text-center text-lg text-gray-500">Todays Confirmed Bookings</h1>
+                    <h1 class="font-medium text-center text-lg text-gray-500">Todays Bookings</h1>
                     <table class="w-full">
                         <thead class="bg-gray-100">
                             <tr>
@@ -64,20 +64,26 @@
                                 <th class="border py-1">Room</th>
                                 <th class="border py-1">Guests</th>
                                 <th class="border py-1">Days</th>
+                                <th class="border py-1">Status</th>
                             </tr>
                         </thead>
-                        <tbody v-if="todaysConfirmedBookings.length">
-                            <tr v-for="booking in todaysConfirmedBookings" :key="booking.id">
+                        <tbody v-if="todaysBooking.length">
+                            <tr v-for="booking in todaysBooking" :key="booking.id">
                                 <td class="border py-1 text-center">{{ booking.id }}</td>
                                 <td class="border py-1 text-center">{{ booking.firstName + ' ' + booking.lastName }}</td>
                                 <td class="border py-1 text-center">{{ booking.roomName }}</td>
                                 <td class="border py-1 text-center">{{ booking.guests }}</td>
                                 <td class="border py-1 text-center">{{ booking.days }}</td>
+                                <td class="border py-1 text-center capitalize">
+                                    <div class="bg-red-500 text-white rounded" :class="{ '!bg-green-500': booking.status === 'confirmed' }">
+                                        {{ booking.status }}
+                                    </div>
+                                </td>
                             </tr>
                         </tbody>
                         <tbody v-else>
                             <tr>
-                                <td colspan="5" class="border py-2 text-center">No confirmed booking today</td>
+                                <td colspan="6" class="border py-2 text-center">No confirmed booking today</td>
                             </tr>
                         </tbody>
                     </table>
@@ -133,6 +139,28 @@
                         </tbody>
                     </table>
                 </div>
+                <div class="bg-white space-y-3 h-fit rounded-xl border p-5">
+                    <h1 class="text-center text-gray-500 font-medium text-lg">Low Stocks Items</h1>
+                    <table class="w-full">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="border py-1 w-2/3">Item Name</th>
+                                <th class="border py-1 w-1/3">Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody v-if="lowStocks.length">
+                            <tr v-for="item in lowStocks" :key="item.id">
+                                <td class="border py-1 text-center">{{ item.name }}</td>
+                                <td class="border py-1 text-center">{{ item.quantity }}</td>
+                            </tr>
+                        </tbody>
+                        <tbody v-else>
+                            <tr>
+                                <td colspan="3" class="border py-1 text-center">No staffs yet</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -158,6 +186,14 @@ const canceledBookings = computed(() => dataStore.canceledBookings)
 const pendingBookings = computed(() => dataStore.pendingBookings)
 const todaysConfirmedBookings = computed(() => dataStore.todaysConfirmedBookings)
 const confirmedBookings = computed(() => dataStore.confirmedBookings)
+const items = computed(() => dataStore.items)
+
+const todaysBooking = computed(() => ([
+    ...pendingBookings.value,
+    ...todaysConfirmedBookings.value,
+]))
+
+const lowStocks = items.value.filter(item => item.quantity < 50)
 
 // filter revenue year
 const months = [ "January", "February", "March", "April", "May", "June", 

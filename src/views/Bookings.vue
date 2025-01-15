@@ -29,8 +29,8 @@
                 <table class="w-[170%] rounded-md overflow-hidden" id="bookingsTable">
                     <thead class="bg-custom-primary text-white">
                         <tr>
-                            <th class="border w-fit py-2">Name</th>
                             <th class="border w-fit py-2">Booking Id</th>
+                            <th class="border w-fit py-2">Name</th>
                             <th class="border w-fit py-2">GCASH Reference</th>
                             <th class="border w-fit py-2">Room Name</th>
                             <th class="border w-fit py-2">Guests</th>
@@ -45,8 +45,8 @@
                     </thead>
                     <tbody v-if="filteredBookings()?.length">
                         <tr v-for="(booking, index) in filteredBookings()" :key="booking.id" :class="{ 'bg-gray-100': index % 2 === 0 }" class="border-b">
-                            <td class="border-x text-center py-2 capitalize">{{ booking.firstName + ' ' + booking.lastName }}</td>
                             <td class="border-x text-center py-2 capitalize">{{ booking.id }}</td>
+                            <td class="border-x text-center py-2 capitalize">{{ booking.firstName + ' ' + booking.lastName }}</td>
                             <td class="border-x text-center py-2 capitalize">{{ booking.referenceNumber }}</td>
                             <td class="border-x text-center py-2 capitalize">{{ booking.roomName }}</td>
                             <td class="border-x text-center py-2 capitalize">{{ booking.guests }}</td>
