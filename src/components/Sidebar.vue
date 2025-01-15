@@ -14,9 +14,13 @@
                 <span class="text-xl">Notifications</span>
                 <div v-if="hasUnviewNotifications()" class="w-3 aspect-square bg-red-500 rounded-full ml-auto"></div>
             </router-link>
-            <router-link :to="{ name: 'rooms' }" class="flex items-center gap-x-2 px-4 py-3">
+            <router-link :to="{ name: 'roomTypes' }" class="flex items-center gap-x-2 px-4 py-3">
                 <Icon icon="material-symbols-light:bedroom-child-outline" class="text-3xl" />
                 <span class="text-xl">Room Types</span>
+            </router-link>
+            <router-link :to="{ name: 'rooms' }" class="flex items-center gap-x-2 px-4 py-3">
+                <Icon icon="material-symbols-light:bedroom-child-outline" class="text-3xl" />
+                <span class="text-xl">Rooms</span>
             </router-link>
             <router-link :to="{ name: 'promos' }" class="flex items-center gap-x-2 px-4 py-3">
                 <Icon icon="lsicon:badge-promotion-outline" class="text-3xl" />

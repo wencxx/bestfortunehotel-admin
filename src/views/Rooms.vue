@@ -2,10 +2,10 @@
     <div class="p-20 !pt-14 space-y-10">
         <div class="flex gap-x-2 items-center">
             <Icon icon="material-symbols-light:bedroom-child-outline" class="text-4xl" />
-            <h1 class="text-xl">Room Types</h1>
+            <h1 class="text-xl">Rooms</h1>
         </div>
         <div class="flex">
-            <button class="ml-auto border border-custom-primary text-custom-primary px-3 py-1 rounded hover:shadow-md" @click="willAddRoom = true">Add Room Type    </button>
+            <button class="ml-auto border border-custom-primary text-custom-primary px-3 py-1 rounded hover:shadow-md" @click="willAddRoom = true">Add Room</button>
         </div>
         <div class="bg-white w-full h-fit p-5 rounded-lg shadow space-y-5">
             <div class="flex justify-start gap-x-2">
@@ -30,24 +30,18 @@
                     <thead class="bg-custom-primary text-white">
                         <tr>
                             <th class="border w-2/12 py-2">Room Type</th>
-                            <th class="border w-1/12 py-2">Price</th>
-                            <th class="border w-1/12 py-2">Capacity</th>
-                            <th class="border w-1/12 py-2">Room Size</th>
-                            <th class="border w-1/12 py-2">Bed</th>
-                            <th class="border w-1/12 py-2">Bathroom</th>
-                            <th class="border w-3/12 py-2">Key Features</th>
+                            <th class="border w-1/12 py-2">Room Floor</th>
+                            <th class="border w-1/12 py-2">Room Number</th>
+                            <th class="border w-1/12 py-2">Room Status</th>
                             <th class="border w-1/12 py-2">Action</th>
                         </tr>
                     </thead>
                     <tbody v-if="filteredRoom()?.length">
                         <tr v-for="(room, index) in filteredRoom()" :key="room.id" :class="{ 'bg-gray-100': index % 2 === 0 }" class="border-b">
-                            <td class="border-x text-center py-2 capitalize">{{ room.roomName }}</td>
-                            <td class="border-x text-center py-2 capitalize">{{ formatCurrency(room.roomPrice) }}</td>
-                            <td class="border-x text-center py-2 capitalize">{{ room.roomCapacity }}</td>
-                            <td class="border-x text-center py-2 capitalize">{{ room.roomSize }}</td>
-                            <td class="border-x text-center py-2 capitalize">{{ room.roomBed }}</td>
-                            <td class="border-x text-center py-2 capitalize">{{ room.roomBathroom }}</td>
-                            <td class="border-x text-center py-2"><span class="line-clamp-3">{{ room.roomKeyFeatures || 'N/A' }}</span></td>
+                            <td class="border-x text-center py-2 capitalize">{{ filterRoomType(room.roomType)?.roomName }}</td>
+                            <td class="border-x text-center py-2 capitalize">{{ room.roomFloor }}</td>
+                            <td class="border-x text-center py-2 capitalize">{{ room.roomNumber }}</td>
+                            <td class="border-x text-center py-2 capitalize">{{ room.roomStatus }}</td>
                             <td class="border-x text-center py-2">
                                 <div class="flex items-center gap-x-2 justify-center text-xl">
                                     <Icon icon="mdi:pencil" class="text-green-500" @click="editRoom(room, index)" />
@@ -58,7 +52,7 @@
                     </tbody>
                     <tbody v-else>
                         <tr>
-                            <td class="border text-center py-2" colspan="9">No rooms to show</td>
+                            <td class="border text-center py-2" colspan="5">No rooms to show</td>
                         </tr>
                     </tbody>
                 </table>
@@ -72,8 +66,8 @@
 </template>
 
 <script setup>
-import AddRoom from '../components/AddRoomType.vue'
-import EditRoom from '../components/EditRoomType.vue'
+import AddRoom from '../components/AddRoom.vue'
+import EditRoom from '../components/EditRoom.vue'
 import DeleteModal from '../components/DeleteModal.vue'
 import { onMounted, ref } from 'vue'
 import { db } from '../config/firebaseConfig'
@@ -85,6 +79,7 @@ const $toast = useToast()
 
 onMounted(() => {
     getRoom()
+    getRoomType()
 })
 
 
@@ -122,7 +117,7 @@ const filteredRoom = () => {
 
 
 
-const roomsRef = collection(db, 'rooms')
+const roomsRef = collection(db, 'roomNumbers')
 const getRoom = async () => {
     try {
         const snapshots = await getDocs(roomsRef)
@@ -138,8 +133,26 @@ const getRoom = async () => {
     }
 }
 
-const formatCurrency = (price) => {
-    return `₱ ${new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'PHP', currencyDisplay: 'code' }).format(Number(price)).replace('PHP', '')}`
+const roomTypes = ref([])
+
+const roomTypesRef = collection(db, 'rooms')
+const getRoomType = async () => {
+    try {
+        const snapshots = await getDocs(roomTypesRef)
+
+        snapshots.docs.forEach(doc => {
+            roomTypes.value.push({
+                id: doc.id,
+                ...doc.data()
+            })
+        })
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+const filterRoomType = (typeId) => {
+    return roomTypes.value.find(roomType => roomType.id === typeId)
 }
 
 // add room
@@ -184,12 +197,12 @@ const deleteRoom = (roomId, index) => {
 const confirmDelete = async () => {
     try {
         willDeleteRoom.value = false
-        await deleteDoc(doc(db, 'rooms', roomToDeleteId.value))
+        await deleteDoc(doc(db, 'roomNumbers', roomToDeleteId.value))
 
         rooms.value.splice(roomToDeleteIndex.value, 1)
-        $toast.success('Room type successfully deleted')
+        $toast.success('Room successfully deleted')
     } catch (error) {
-        $toast.error('Failed to delete room type')
+        $toast.error('Failed to delete room')
     }
 }
 
