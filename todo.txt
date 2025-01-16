@@ -15,13 +15,13 @@ Dashboard
 -Sa "Todays Confirmed Bookings" dapat nakikita din dun yung pending bookings - DONE
 
 Notifications
--Pag may new bookings, dapat nag nonotify sya sa notifications
+-Pag may new bookings, dapat nag nonotify sya sa notifications - DONE
 
 Bookings
 -Dapat nauuna yung Booking ID, bago Name sa table. - DONE
 
 Rooms
--Rooms are automatically Occupied when Booked by the customers 
+-Rooms are automatically Occupied when Booked by the customers - DONE
 - Room Name palitan ng Room Type - DONE
 
 Promos

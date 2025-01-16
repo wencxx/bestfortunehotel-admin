@@ -65,7 +65,7 @@
                             <td class="border-x text-center py-2">
                                 <div class="flex items-center gap-x-2 justify-center text-2xl" v-if="booking.status !== 'canceled'">
                                     <Icon icon="mdi:check" class="text-green-500 cursor-pointer" @click="showConfirmationModal(booking.id)" />
-                                    <Icon icon="mdi:close" class="text-red-500 cursor-pointer" @click="showWarningModal(booking.id)" />
+                                    <Icon icon="mdi:close" class="text-red-500 cursor-pointer" @click="showWarningModal(booking.id, booking.roomNumberId)" />
                                 </div>
                                 <div class="flex items-center gap-x-2 justify-center text-2xl" v-else>
                                     <Icon icon="mdi:trash" class="text-red-500 cursor-pointer" @click="showDeleteModal(booking.id)" />
@@ -181,9 +181,11 @@ const acceptBooking = async () => {
 // decline booking
 const showWarning = ref(false)
 const bookingToDecline = ref('')
+const roomNumberIdToDecline = ref('')
 
-const showWarningModal = (bookingId) => {
+const showWarningModal = (bookingId, roomNumberId) => {
     bookingToDecline.value = bookingId
+    roomNumberIdToDecline.value = roomNumberId
     showWarning.value = true
 }
 
@@ -191,6 +193,10 @@ const declineBooking = async () => {
     try {
         await updateDoc(doc(db, 'booking', bookingToDecline.value), {
             status: 'declined'
+        })
+
+        await updateDoc(doc(db, 'roomNumbers', roomNumberIdToDecline.value), {
+            roomStatus: 'Available'
         })
 
         $toast.success('Declined Booking Successfully')

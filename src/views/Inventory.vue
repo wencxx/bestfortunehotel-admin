@@ -219,7 +219,7 @@ watch(
         await Promise.all(notificationPromises);
 
         itemsToNotify.forEach(item => notifiedItems.value.add(item.id));
-        saveNotifiedItems(); 
+        saveNotifiedItems();
       }
     } catch (error) {
       console.error('Error creating notifications:', error);
