@@ -34,6 +34,8 @@
                             <th class="border w-fit py-2">GCASH Reference</th>
                             <th class="border w-fit py-2">Room Name</th>
                             <th class="border w-fit py-2">Guests</th>
+                            <th class="border w-fit py-2">Floor</th>
+                            <th class="border w-fit py-2">Room Number</th>
                             <th class="border w-fit py-2">Check In</th>
                             <th class="border w-fit py-2">Check Out</th>
                             <th class="border w-fit py-2">Days</th>
@@ -50,6 +52,8 @@
                             <td class="border-x text-center py-2 capitalize">{{ booking.referenceNumber }}</td>
                             <td class="border-x text-center py-2 capitalize">{{ booking.roomName }}</td>
                             <td class="border-x text-center py-2 capitalize">{{ booking.guests }}</td>
+                            <td class="border-x text-center py-2 capitalize">{{ booking.floor }}</td>
+                            <td class="border-x text-center py-2 capitalize">{{ booking.number }}</td>
                             <td class="border-x text-center py-2 capitalize">{{ formatDate(booking.checkIn) }}</td>
                             <td class="border-x text-center py-2 capitalize">{{ formatDate(booking.checkOut) }}</td>
                             <td class="border-x text-center py-2 capitalize">{{ booking.days }}</td>

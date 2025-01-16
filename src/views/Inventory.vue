@@ -40,7 +40,6 @@
                             <td class="border-x text-center py-2 capitalize px-2"><span class="line-clamp-3">{{ item.name }}</span></td>
                             <td class="border-x text-center py-2 capitalize px-2"><span class="line-clamp-3">{{ item.quantity }}</span></td>
                             <td class="border-x text-center py-2 capitalize">
-                                
                                 <button class="bg-green-500 px-3 rounded text-white" :class="{ 'bg-red-500': item.quantity < 50 }">
                                     {{ item.quantity > 49 ? 'In Stock' : 'Low Stock'  }}
                                 </button>
@@ -83,8 +82,8 @@ const $toast = useToast()
 
 onMounted(() => {
     getItems()
+    loadNotifiedItems()
 })
-
 
 // get items 
 const items = ref([])
@@ -116,8 +115,6 @@ const filteredItems = () => {
     return filtered.slice(0, rowLimit.value)
 }
 
-
-
 const itemsRef = collection(db, 'items')
 const getItems = async () => {
     try {
@@ -134,7 +131,7 @@ const getItems = async () => {
     }
 }
 
-// add room
+// add item
 const willAddItem = ref(false)
 
 const closeModal = (data) => {
@@ -144,7 +141,7 @@ const closeModal = (data) => {
     willAddItem.value = false
 }
 
-// edit room
+// edit item
 const willEditItem = ref(false)
 const itemToEditDetails = ref({})
 const itemIndex = ref(0)
@@ -162,7 +159,7 @@ const closeEditModal = (data) => {
     willEditItem.value = false
 }
 
-// delete room
+// delete item
 const willDeleteItem = ref(false)
 const itemToDeleteId = ref('')
 const itemToDeleteIndex = ref('')
@@ -189,15 +186,23 @@ const confirmDelete = async () => {
 // check if has low stock
 const notifRef = collection(db, 'notifications')
 
-const lowStockThreshold = 50; 
-const notifiedItems = ref(new Set());
+const lowStockThreshold = 50
+const notifiedItems = ref(new Set())
+
+const loadNotifiedItems = () => {
+    const savedNotifiedItems = JSON.parse(localStorage.getItem('notifiedItems')) || []
+    notifiedItems.value = new Set(savedNotifiedItems)
+}
+
+const saveNotifiedItems = () => {
+    localStorage.setItem('notifiedItems', JSON.stringify(Array.from(notifiedItems.value)))
+}
 
 watch(
   () => items.value,
-  async (newItems, oldItems) => {
+  async (newItems) => {
     try {
       const lowStockItems = newItems.filter(item => item.quantity < lowStockThreshold);
-
       const itemsToNotify = lowStockItems.filter(item => !notifiedItems.value.has(item.id));
 
       if (itemsToNotify.length > 0) {
@@ -214,6 +219,7 @@ watch(
         await Promise.all(notificationPromises);
 
         itemsToNotify.forEach(item => notifiedItems.value.add(item.id));
+        saveNotifiedItems(); 
       }
     } catch (error) {
       console.error('Error creating notifications:', error);
@@ -222,34 +228,22 @@ watch(
   { immediate: true, deep: true }
 );
 
-
 // generate csv
 const generateCSV = () => {
     let table = document.getElementById('inventoryTable');
     let rows = table.querySelectorAll('tr');
-    let csvContent = '';
-
-    rows.forEach((row) => {
+    let csvContent = "data:text/csv;charset=utf-8,";
+    rows.forEach(row => {
         let rowData = [];
-        let cols = row.querySelectorAll('td:not(:last-child), th:not(:last-child)'); 
-
-        cols.forEach((col) => {
-            let cellText = col.innerText.trim();
-            rowData.push(`"${cellText.replace(/"/g, '""')}"`);
+        row.querySelectorAll('th, td').forEach(cell => {
+            rowData.push(cell.innerText);
         });
-
-        if (rowData.length > 0) {
-            csvContent += rowData.join(',') + '\n';
-        }
+        csvContent += rowData.join(",") + "\r\n";
     });
-
-    let blob = new Blob([csvContent], { type: 'text/csv' });
-    let link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'Inventory.csv';
-    document.body.appendChild(link);
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "inventory.csv");
     link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(link.href);
-};
+}
 </script>
