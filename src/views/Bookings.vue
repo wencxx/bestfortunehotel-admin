@@ -29,6 +29,7 @@
                 <table class="w-[170%] rounded-md overflow-hidden" id="bookingsTable">
                     <thead class="bg-custom-primary text-white">
                         <tr>
+                            <th class="border w-fit py-2">Booking At</th>
                             <th class="border w-fit py-2">Booking Id</th>
                             <th class="border w-fit py-2">Name</th>
                             <th class="border w-fit py-2">GCASH Reference</th>
@@ -47,6 +48,7 @@
                     </thead>
                     <tbody v-if="filteredBookings()?.length">
                         <tr v-for="(booking, index) in filteredBookings()" :key="booking.id" :class="{ 'bg-gray-100': index % 2 === 0 }" class="border-b">
+                            <td class="border-x text-center py-2 capitalize">{{ formatFirebaseTimestamp(booking.bookedAt) }}</td>
                             <td class="border-x text-center py-2 capitalize">{{ booking.id }}</td>
                             <td class="border-x text-center py-2 capitalize">{{ booking.firstName + ' ' + booking.lastName }}</td>
                             <td class="border-x text-center py-2 capitalize">{{ booking.referenceNumber }}</td>
@@ -60,11 +62,11 @@
                             <td class="border-x text-center py-2 capitalize">{{ booking.beds || 0 }} beds</td>
                             <td class="border-x text-center py-2 capitalize">{{ formatCurrency(booking.totalPrice) }}</td>
                             <td class="border-x text-center p-1 capitalize">
-                                <button class="px-2 text-white rounded py-1 w-2/4 capitalize" :class="{ 'bg-orange-500': booking.status === 'pending', 'bg-red-700': booking.status === 'canceled', 'bg-red-500': booking.status === 'declined', 'bg-green-500': booking.status === 'confirmed' }">{{ booking.status }}</button>
+                                <button class="px-2 text-white rounded py-1 w-3/4 capitalize" :class="{ 'bg-orange-500': booking.status === 'pending', 'bg-red-700': booking.status === 'canceled', 'bg-red-500': booking.status === 'declined', 'bg-green-500': booking.status === 'confirmed' }">{{ booking.status }}</button>
                             </td>
                             <td class="border-x text-center py-2">
                                 <div class="flex items-center gap-x-2 justify-center text-2xl" v-if="booking.status !== 'canceled'">
-                                    <Icon icon="mdi:check" class="text-green-500 cursor-pointer" @click="showConfirmationModal(booking.id)" />
+                                    <Icon v-if="booking.status !== 'confirmed'" icon="mdi:check" class="text-green-500 cursor-pointer" @click="showConfirmationModal(booking.id)" />
                                     <Icon icon="mdi:close" class="text-red-500 cursor-pointer" @click="showWarningModal(booking.id, booking.roomNumberId)" />
                                 </div>
                                 <div class="flex items-center gap-x-2 justify-center text-2xl" v-else>
@@ -153,6 +155,12 @@ const formatDate = (date) => {
     return moment(new Date(date)).format('ll')
 }
 
+function formatFirebaseTimestamp(firebaseTimestamp) {
+    const { seconds, nanoseconds } = firebaseTimestamp;
+    const milliseconds = seconds * 1000 + nanoseconds / 1e6;
+    return moment(milliseconds).format('lll');
+}
+
 // accept booking 
 const showConfirmation = ref(false)
 const bookingToAccept = ref('')
@@ -189,10 +197,11 @@ const showWarningModal = (bookingId, roomNumberId) => {
     showWarning.value = true
 }
 
-const declineBooking = async () => {
+const declineBooking = async (data) => {
     try {
         await updateDoc(doc(db, 'booking', bookingToDecline.value), {
-            status: 'declined'
+            status: 'declined',
+            reasonForDeclining: data
         })
 
         await updateDoc(doc(db, 'roomNumbers', roomNumberIdToDecline.value), {

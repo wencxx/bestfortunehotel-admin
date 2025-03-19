@@ -49,6 +49,24 @@
                 <label>Room Key Features <span class="text-custom-primary">*</span></label>
                 <textarea class="border rounded min-h-20 p-2" v-model="roomDetails.roomKeyFeatures"></textarea>
             </div>
+            <div class="flex flex-col gap-y-1 col-span-2">
+                <label >Room Promo <span class="text-custom-primary">*</span></label>
+                <select class="border rounded h-8" v-model="roomDetails.roomPromo">
+                    <option value="" disabled>None</option>
+                    <option>5%</option>
+                    <option>10%</option>
+                    <option>15%</option>
+                    <option>20%</option>
+                    <option>25%</option>
+                    <option>30%</option>
+                    <option>35%</option>
+                    <option>40%</option>
+                    <option>45%</option>
+                    <option>50%</option>
+                    <option>55%</option>
+                    <option>60%</option>
+                </select>
+            </div>
             <div class="flex gap-x-3 justify-end col-span-2 mt-5">
                 <button class="border border-custom-primary w-1/4 rounded text-custom-primary" type="button" @click="closeModal">Close</button>
                 <button v-if="!updatingRoom" class="bg-custom-primary w-1/4 rounded text-white">Update</button>
@@ -84,6 +102,7 @@ const roomDetails = ref({
     roomBed: roomDetailsToEdit.roomBed || '',
     roomBathroom: roomDetailsToEdit.roomBathroom || '',
     roomKeyFeatures: roomDetailsToEdit.roomKeyFeatures || '',
+    roomPromo: roomDetailsToEdit.roomPromo || '',
     // isAvailable: roomDetailsToEdit.isAvailable,
 })
 

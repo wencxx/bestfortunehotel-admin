@@ -31,29 +31,7 @@
                         </div>
                     </div>
                 </div>
-                <!-- graph -->
-                <div class="p-10 bg-white rounded-xl border">
-                    <select class="border float-end px-3 py-1 rounded" v-model="revenueYear">
-                        <option>2020</option>
-                        <option>2021</option>
-                        <option>2022</option>
-                        <option>2023</option>
-                        <option>2024</option>
-                        <option>2025</option>
-                        <option>2026</option>
-                        <option>2027</option>
-                        <option>2028</option>
-                        <option>2029</option>
-                        <option>2030</option>
-                        <option>2031</option>
-                        <option>2032</option>
-                        <option>2033</option>
-                        <option>2034</option>
-                        <option>2035</option>
-                    </select>
-                    <AreaChart :data="Object.values(filteredRevenue)" :labels="revenueMonths" />
-                </div>
-                <!-- table -->
+                 <!-- table -->
                 <div class="p-10 bg-white rounded-xl border space-y-3">
                     <h1 class="font-medium text-center text-lg text-gray-500">Todays Bookings</h1>
                     <table class="w-full">
@@ -87,6 +65,28 @@
                             </tr>
                         </tbody>
                     </table>
+                </div>
+                <!-- graph -->
+                <div class="p-10 bg-white rounded-xl border">
+                    <select class="border float-end px-3 py-1 rounded" v-model="revenueYear">
+                        <option>2020</option>
+                        <option>2021</option>
+                        <option>2022</option>
+                        <option>2023</option>
+                        <option>2024</option>
+                        <option>2025</option>
+                        <option>2026</option>
+                        <option>2027</option>
+                        <option>2028</option>
+                        <option>2029</option>
+                        <option>2030</option>
+                        <option>2031</option>
+                        <option>2032</option>
+                        <option>2033</option>
+                        <option>2034</option>
+                        <option>2035</option>
+                    </select>
+                    <AreaChart :data="Object.values(filteredRevenue)" :labels="revenueMonths" />
                 </div>
             </div>
             <div class="col-span-3 xl:col-span-2 space-y-5">
@@ -176,6 +176,7 @@ const dataStore = useDataStore()
 
 onMounted(() => {
     dataStore.getBookings()
+    dataStore.addRoomsToClean()
 })
 
 const popularRooms = computed(() => dataStore.popularRooms)

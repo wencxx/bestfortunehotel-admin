@@ -53,13 +53,15 @@ const notifications = computed(() => dataStore.notifications)
 const filterSelect = ref('')
 
 const fileredNotifications = () => {
-    if(!filterSelect.value) return notifications.value
+    let filtered = notifications.value
 
     if(filterSelect.value === 'New'){
-        return notifications.value.filter(notif => notif.isRead === false)
-    }else{
-        return notifications.value.filter(notif => notif.isRead === true)
+        filtered = filtered.filter(notif => notif.isRead === false)
+    } else if(filterSelect.value === 'Old'){
+        filtered = filtered.filter(notif => notif.isRead === true)
     }
+
+    return filtered.sort((a, b) => b.notifiedAt.toDate() - a.notifiedAt.toDate())
 }
 
 onMounted(() => {

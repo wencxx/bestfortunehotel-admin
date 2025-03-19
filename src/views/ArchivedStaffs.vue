@@ -2,7 +2,7 @@
     <div class="p-20 !pt-14 space-y-10">
         <div class="flex gap-x-2 items-center">
             <Icon icon="healthicons:city-worker-outline" class="text-4xl" />
-            <h1 class="text-xl">Staffs Lists</h1>
+            <h1 class="text-xl">Archived Staffs Lists</h1>
         </div>
         <div class="flex">
             <button class="ml-auto border border-custom-primary text-custom-primary px-3 py-1 rounded hover:shadow-md" @click="willAddStaff = true">Add Staff</button>
@@ -55,9 +55,9 @@
                             <td class="border-x text-center py-2 capitalize">{{ staff.contactNumber }}</td>
                             <td class="border-x text-center py-2">
                                 <div class="flex items-center gap-x-2 justify-center text-xl">
-                                    <Icon icon="mdi:pencil" class="text-green-500 cursor-pointer" @click="editStaff(staff)" />
+                                    <!-- <Icon icon="mdi:pencil" class="text-green-500 cursor-pointer" @click="editStaff(staff)" /> -->
                                     <!-- <Icon icon="mdi:trash" class="text-red-500 cursor-pointer" @click="deleteStaff(staff.id, index)" /> -->
-                                    <Icon icon="tabler:archive-filled" class="text-red-500 cursor-pointer" @click="archiveStaff(staff.id, index)" />
+                                    <Icon icon="mdi:restore" class="text-green-500 cursor-pointer" @click="restoreStaff(staff.id, index)" />
                                 </div>
                             </td>
                         </tr>
@@ -93,11 +93,11 @@ const dataStore = useDataStore()
 const $toast = useToast()
 
 onMounted(() => {
-    dataStore.getStaffs()
+    dataStore.getArchivedtaffs()
 })
 
 // get staffs 
-const staffs = computed(() => dataStore.staffs)
+const staffs = computed(() => dataStore.archivedStaffs)
 
 const filterSelect = ref('')
 const searchQuery = ref('')
@@ -122,13 +122,12 @@ const filteredStaff = () => {
     return filtered.slice(0, rowLimit.value)
 }
 
-const archiveStaff = async (staffId, index) => {
+const restoreStaff = async (staffId, index) => {
     try {
         const staffRef = doc(db, 'staffs', staffId);
-        await updateDoc(staffRef, { status: 'archived' });
+        await updateDoc(staffRef, { status: 'active' });
 
-        $toast.success('Staff successfully archived');
-        dataStore.staffs.splice(index, 1);
+        $toast.success('Staff successfully restored');
     } catch (error) {
         $toast.error('Failed to archive staff');
     }

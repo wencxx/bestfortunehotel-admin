@@ -34,6 +34,10 @@
                 <Icon icon="healthicons:city-worker-outline" class="text-3xl" />
                 <span class="text-xl">Staffs</span>
             </router-link>
+            <router-link :to="{ name: 'archivedStaffs' }" class="flex items-center gap-x-2 px-4 py-3">
+                <Icon icon="healthicons:city-worker-outline" class="text-3xl" />
+                <span class="text-xl">Archived Staffs</span>
+            </router-link>
             <router-link :to="{ name: 'roomsToClean' }" class="flex items-center gap-x-2 px-4 py-3">
                 <Icon icon="guidance:cleaning-room" class="text-3xl" />
                 <span class="text-xl">Rooms To Clean</span>

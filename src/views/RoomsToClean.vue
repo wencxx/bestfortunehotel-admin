@@ -56,7 +56,7 @@
             </div>
         </div>
 
-        <DeleteModal v-if="willDeleteRoom" :type="'Promo'" @closeModal="willDeleteRoom = false" @accept="confirmDelete" />
+        <DeleteModal v-if="willDeleteRoom" :type="'Data'" @closeModal="willDeleteRoom = false" @accept="confirmDelete" />
 
     </div>
 </template>

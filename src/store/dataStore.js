@@ -6,6 +6,7 @@ export const useDataStore = defineStore('dataStore', {
     state: () => ({
         bookings: [],
         staffs: [],
+        archivedStaffs: [],
         notifications: [],
         items: [],
     }),
@@ -33,12 +34,38 @@ export const useDataStore = defineStore('dataStore', {
         },
         async getStaffs() {
             try {
-                onSnapshot(
+                const staffQuery = query(
                     collection(db, 'staffs'),
+                    where('status', '==', 'active')
+                );
+                onSnapshot(
+                    staffQuery,
                     (snapshot) => {
                         this.staffs = []
                         snapshot.docs.forEach(doc => {
                             this.staffs.push({
+                                id: doc.id,
+                                ...doc.data()
+                            })
+                        })
+                    }
+                )
+            } catch (error) {
+                console.log('Failed to get bookings')
+            }
+        },
+        async getArchivedtaffs() {
+            try {
+                const staffQuery = query(
+                    collection(db, 'staffs'),
+                    where('status', '==', 'archived')
+                );
+                onSnapshot(
+                    staffQuery,
+                    (snapshot) => {
+                        this.archivedStaffs = []
+                        snapshot.docs.forEach(doc => {
+                            this.archivedStaffs.push({
                                 id: doc.id,
                                 ...doc.data()
                             })
@@ -89,6 +116,7 @@ export const useDataStore = defineStore('dataStore', {
             try {
                 const today = new Date().toISOString().split('T')[0]; 
                 const roomsToCleanCollection = collection(db, 'roomsToClean');
+                const notifRef = collection(db, 'notifications')
         
                 for (const booking of this.bookings) {
                     const checkOutDate = booking.checkOut;
@@ -108,6 +136,14 @@ export const useDataStore = defineStore('dataStore', {
                                 checkOutDate: booking.checkOut,
                                 cleaned: false
                             });
+                            await addDoc(notifRef, {
+                                notif: `Room to clean: ${booking.roomName} requires cleaning.`,
+                                isRead: false,
+                                isView: false,
+                                notifiedAt: new Date()
+                            })
+
+                            console.log(success)
                         }
                     }
                 }

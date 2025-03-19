@@ -66,6 +66,14 @@ const routes = [
         }
     },
     {
+        path: '/archive-staffs',
+        name: 'archivedStaffs',
+        component: () => import('../views/ArchivedStaffs.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
+    {
         path: '/rooms-to-clean',
         name: 'roomsToClean',
         component: () => import('../views/RoomsToClean.vue'),

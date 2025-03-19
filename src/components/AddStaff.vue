@@ -99,6 +99,7 @@ const addStaff = async () => {
 
         const snapshot = await addDoc(staffsRef, {
             ...staffData.value,
+            status: 'active',
             addedAt: new Date()
         })
 

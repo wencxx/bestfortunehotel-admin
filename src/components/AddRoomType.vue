@@ -48,6 +48,24 @@
                 <label >Room Key Features <span class="text-custom-primary">*</span></label>
                 <textarea class="border rounded min-h-20 p-2" v-model="roomDetails.roomKeyFeatures"></textarea>
             </div>
+            <div class="flex flex-col gap-y-1 col-span-2">
+                <label >Room Promo <span class="text-custom-primary">*</span></label>
+                <select class="border rounded h-8" v-model="roomDetails.roomPromo">
+                    <option value="" disabled>None</option>
+                    <option>5%</option>
+                    <option>10%</option>
+                    <option>15%</option>
+                    <option>20%</option>
+                    <option>25%</option>
+                    <option>30%</option>
+                    <option>35%</option>
+                    <option>40%</option>
+                    <option>45%</option>
+                    <option>50%</option>
+                    <option>55%</option>
+                    <option>60%</option>
+                </select>
+            </div>
             <div class="flex flex-col gap-y-1">
                 <label >Room Thumbnail <span class="text-custom-primary">*</span></label>
                 <input type="file" accept=".jpg, .png, .jpeg" class="rounded h-8" @change="changeThumbnail">
@@ -99,6 +117,7 @@ const roomDetails = ref({
     roomBed: '',
     roomBathroom: '',
     roomKeyFeatures: '',
+    roomPromo: '',
 })
 
 // room images
@@ -178,6 +197,7 @@ const addRoom = async () => {
       roomBed: roomDetails.value.roomBed,
       roomBathroom: roomDetails.value.roomBathroom,
       roomKeyFeatures: roomDetails.value.roomKeyFeatures,
+      roomPromo: roomDetails.value.roomPromo,
       isAvailable: true,
       thumbnailUrl: thumbnailUrl || '',
       imagesUrls: imagesUrls,
