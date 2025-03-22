@@ -41,28 +41,33 @@
         >
           Generate PDF
         </button>
-        <!-- <button class="bg-blue-500 px-3 rounded text-white" @click="generateReport">Generate Report</button> -->
+        <button
+          class="bg-blue-500 text-white px-3 rounded"
+          @click="showColumnModal = true"
+        >
+          Select Columns
+        </button>
       </div>
       <div class="w-full overflow-x-auto">
         <table class="w-[170%] rounded-md overflow-hidden" id="bookingsTable">
           <thead class="bg-custom-primary text-white">
             <tr>
-              <th class="border w-fit py-2">Booking At</th>
-              <th class="border w-fit py-2">Booking Id</th>
-              <th class="border w-fit py-2">Type</th>
-              <th class="border w-fit py-2">Name</th>
-              <th class="border w-fit py-2">GCASH Reference</th>
-              <th class="border w-fit py-2">Room Name</th>
-              <th class="border w-fit py-2">Guests</th>
-              <th class="border w-fit py-2">Floor</th>
-              <th class="border w-fit py-2">Room Number</th>
-              <th class="border w-fit py-2">Check In</th>
-              <th class="border w-fit py-2">Check Out</th>
-              <th class="border w-fit py-2">Days</th>
-              <th class="border w-fit py-2">Add Ons</th>
-              <th class="border w-fit py-2">Total Price</th>
-              <th class="border w-fit py-2">Status</th>
-              <th class="border w-fit py-2">Action</th>
+              <th v-if="selectedColumns.includes('Booking At')" class="border w-fit py-2">Booking At</th>
+              <th v-if="selectedColumns.includes('Booking Id')" class="border w-fit py-2">Booking Id</th>
+              <th v-if="selectedColumns.includes('Type')" class="border w-fit py-2">Type</th>
+              <th v-if="selectedColumns.includes('Name')" class="border w-fit py-2">Name</th>
+              <th v-if="selectedColumns.includes('GCASH Reference')" class="border w-fit py-2">GCASH Reference</th>
+              <th v-if="selectedColumns.includes('Room Name')" class="border w-fit py-2">Room Name</th>
+              <th v-if="selectedColumns.includes('Guests')" class="border w-fit py-2">Guests</th>
+              <th v-if="selectedColumns.includes('Floor')" class="border w-fit py-2">Floor</th>
+              <th v-if="selectedColumns.includes('Room Number')" class="border w-fit py-2">Room Number</th>
+              <th v-if="selectedColumns.includes('Check In')" class="border w-fit py-2">Check In</th>
+              <th v-if="selectedColumns.includes('Check Out')" class="border w-fit py-2">Check Out</th>
+              <th v-if="selectedColumns.includes('Days')" class="border w-fit py-2">Days</th>
+              <th v-if="selectedColumns.includes('Add Ons')" class="border w-fit py-2">Add Ons</th>
+              <th v-if="selectedColumns.includes('Total Price')" class="border w-fit py-2">Total Price</th>
+              <th v-if="selectedColumns.includes('Status')" class="border w-fit py-2">Status</th>
+              <th v-if="selectedColumns.includes('Action')" class="border w-fit py-2">Action</th>
             </tr>
           </thead>
           <tbody v-if="filteredBookings()?.length">
@@ -72,49 +77,49 @@
               :class="{ 'bg-gray-100': index % 2 === 0 }"
               class="border-b"
             >
-              <td class="border-x text-center py-2 capitalize">
+              <td v-if="selectedColumns.includes('Booking At')" class="border-x text-center py-2 capitalize">
                 {{ formatFirebaseTimestamp(booking.bookedAt) }}
               </td>
-              <td class="border-x text-center py-2 capitalize">
+              <td v-if="selectedColumns.includes('Booking Id')" class="border-x text-center py-2 capitalize">
                 {{ booking.id }}
               </td>
-              <td class="border-x text-center py-2 capitalize">
+              <td v-if="selectedColumns.includes('Type')" class="border-x text-center py-2 capitalize">
                 {{ booking.type || "online" }}
               </td>
-              <td class="border-x text-center py-2 capitalize">
+              <td v-if="selectedColumns.includes('Name')" class="border-x text-center py-2 capitalize">
                 {{ booking.name || booking.firstName + " " + booking.lastName }}
               </td>
-              <td class="border-x text-center py-2 capitalize">
+              <td v-if="selectedColumns.includes('GCASH Reference')" class="border-x text-center py-2 capitalize">
                 {{ booking.referenceNumber || "--" }}
               </td>
-              <td class="border-x text-center py-2 capitalize">
+              <td v-if="selectedColumns.includes('Room Name')" class="border-x text-center py-2 capitalize">
                 {{ booking.roomName }}
               </td>
-              <td class="border-x text-center py-2 capitalize">
+              <td v-if="selectedColumns.includes('Guests')" class="border-x text-center py-2 capitalize">
                 {{ booking.guests }}
               </td>
-              <td class="border-x text-center py-2 capitalize">
+              <td v-if="selectedColumns.includes('Floor')" class="border-x text-center py-2 capitalize">
                 {{ booking.floor }}
               </td>
-              <td class="border-x text-center py-2 capitalize">
+              <td v-if="selectedColumns.includes('Room Number')" class="border-x text-center py-2 capitalize">
                 {{ booking.number }}
               </td>
-              <td class="border-x text-center py-2 capitalize">
+              <td v-if="selectedColumns.includes('Check In')" class="border-x text-center py-2 capitalize">
                 {{ formatDate(booking.checkIn) }}
               </td>
-              <td class="border-x text-center py-2 capitalize">
+              <td v-if="selectedColumns.includes('Check Out')" class="border-x text-center py-2 capitalize">
                 {{ formatDate(booking.checkOut) }}
               </td>
-              <td class="border-x text-center py-2 capitalize">
+              <td v-if="selectedColumns.includes('Days')" class="border-x text-center py-2 capitalize">
                 {{ booking.days }}
               </td>
-              <td class="border-x text-center py-2 capitalize">
+              <td v-if="selectedColumns.includes('Add Ons')" class="border-x text-center py-2 capitalize">
                 {{ booking.beds || 0 }} beds
               </td>
-              <td class="border-x text-center py-2 capitalize">
+              <td v-if="selectedColumns.includes('Total Price')" class="border-x text-center py-2 capitalize">
                 {{ formatCurrency(booking.totalPrice) }}
               </td>
-              <td class="border-x text-center p-1 capitalize">
+              <td v-if="selectedColumns.includes('Status')" class="border-x text-center p-1 capitalize">
                 <button
                   class="px-2 text-white rounded py-1 w-3/4 capitalize"
                   :class="{
@@ -127,7 +132,7 @@
                   {{ booking.status }}
                 </button>
               </td>
-              <td class="border-x text-center py-2">
+              <td v-if="selectedColumns.includes('Action')" class="border-x text-center py-2">
                 <div
                   class="flex items-center gap-x-2 justify-center text-2xl"
                   v-if="booking.status !== 'canceled'"
@@ -140,6 +145,7 @@
                   />
                   <Icon
                     icon="mdi:close"
+                    v-if="booking.status !== 'declined'"
                     class="text-red-500 cursor-pointer"
                     @click="
                       showWarningModal(
@@ -195,6 +201,11 @@
       @closeModal="showWalkInModal = false"
       @submit="addWalkInBooking"
     />
+    <columnModal
+      v-if="showColumnModal"
+      @closeModal="showColumnModal = false"
+      @updateColumns="updateSelectedColumns"
+    />
   </div>
 </template>
 
@@ -204,6 +215,7 @@ import warningModal from '../components/WarningModal.vue'
 import deleteModal from '../components/DeleteModal.vue'
 import walkInModal from '../components/WalkInModal.vue'
 import AddRoom from '../components/AddRoom.vue'
+import columnModal from '../components/ColumnModal.vue'
 import { onMounted, ref, computed } from 'vue'
 import { useDataStore } from '../store'
 import moment from 'moment'
@@ -438,7 +450,7 @@ const generatePDF = () => {
 
     rows.forEach((row) => {
         let rowData = [];
-        let cols = row.querySelectorAll('td:not(:last-child), th:not(:last-child)');
+        let cols = row.querySelectorAll('td, th');
 
         cols.forEach((col) => {
             let cellText = col.innerText.trim();
@@ -479,5 +491,16 @@ const addWalkInBooking = async (walkInData) => {
     } finally {
         showWalkInModal.value = false
     }
+}
+
+const showColumnModal = ref(false)
+const selectedColumns = ref([
+  'Booking At', 'Booking Id', 'Type', 'Name', 'GCASH Reference', 'Room Name',
+  'Guests', 'Floor', 'Room Number', 'Check In', 'Check Out', 'Days', 'Add Ons',
+  'Total Price', 'Status', 'Action'
+])
+
+const updateSelectedColumns = (columns) => {
+  selectedColumns.value = columns
 }
 </script>
