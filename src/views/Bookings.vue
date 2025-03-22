@@ -1,99 +1,201 @@
 <template>
-    <div class="p-20 !pt-14 space-y-10">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center gap-x-2">
-                <Icon icon="basil:book-mark-outline" class="text-4xl" />
-                <h1 class="text-xl">Booking Lists</h1>
-            </div>
-            <button class="bg-custom-primary px-3 py-1 rounded text-white hover:bg-red-600" @click="showWalkInModal = true">Walk in</button>
-        </div>
-        <div class="bg-white w-full h-fit p-5 rounded-lg shadow space-y-5">
-            <div class="flex justify-start gap-x-2">
-                <select class="border py-1 px-3 rounded" v-model="rowLimit">
-                    <option value="5">5 Rows</option>
-                    <option value="10">10 Rows</option>
-                    <option value="15">15 Rows</option>
-                    <option value="20">20 Rows</option>
-                    <option value="50">50 Rows</option>
-                    <option value="100">100 Rows</option>
-                </select>
-                <select class="border py-1 px-3 rounded" v-model="filterSelect">
-                    <option value="">All Bookings</option>
-                    <option>Pending</option>
-                    <option>Confirmed</option>
-                    <option>Canceled</option>
-                    <option>Declined</option>
-                </select>
-                <input type="text" placeholder="Search" class="border rounded pl-2 ml-auto" v-model="searchQuery">
-                <button class="bg-green-500 text-white px-3 rounded" @click="generateCSV">Generate CSV</button>
-                <!-- <button class="bg-blue-500 px-3 rounded text-white" @click="generateReport">Generate Report</button> -->
-            </div>
-            <div class="w-full overflow-x-auto">
-                <table class="w-[170%] rounded-md overflow-hidden" id="bookingsTable">
-                    <thead class="bg-custom-primary text-white">
-                        <tr>
-                            <th class="border w-fit py-2">Booking At</th>
-                            <th class="border w-fit py-2">Booking Id</th>
-                            <th class="border w-fit py-2">Type</th>
-                            <th class="border w-fit py-2">Name</th>
-                            <th class="border w-fit py-2">GCASH Reference</th>
-                            <th class="border w-fit py-2">Room Name</th>
-                            <th class="border w-fit py-2">Guests</th>
-                            <th class="border w-fit py-2">Floor</th>
-                            <th class="border w-fit py-2">Room Number</th>
-                            <th class="border w-fit py-2">Check In</th>
-                            <th class="border w-fit py-2">Check Out</th>
-                            <th class="border w-fit py-2">Days</th>
-                            <th class="border w-fit py-2">Add Ons</th>
-                            <th class="border w-fit py-2">Total Price</th>
-                            <th class="border w-fit py-2">Status</th>
-                            <th class="border w-fit py-2">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody v-if="filteredBookings()?.length">
-                        <tr v-for="(booking, index) in filteredBookings()" :key="booking.id" :class="{ 'bg-gray-100': index % 2 === 0 }" class="border-b">
-                            <td class="border-x text-center py-2 capitalize">{{ formatFirebaseTimestamp(booking.bookedAt) }}</td>
-                            <td class="border-x text-center py-2 capitalize">{{ booking.id }}</td>
-                            <td class="border-x text-center py-2 capitalize">{{ booking.type || 'online' }}</td>
-                            <td class="border-x text-center py-2 capitalize">{{ booking.name || booking.firstName + ' ' + booking.lastName }}</td>
-                            <td class="border-x text-center py-2 capitalize">{{ booking.referenceNumber || '--' }}</td>
-                            <td class="border-x text-center py-2 capitalize">{{ booking.roomName }}</td>
-                            <td class="border-x text-center py-2 capitalize">{{ booking.guests }}</td>
-                            <td class="border-x text-center py-2 capitalize">{{ booking.floor }}</td>
-                            <td class="border-x text-center py-2 capitalize">{{ booking.number }}</td>
-                            <td class="border-x text-center py-2 capitalize">{{ formatDate(booking.checkIn) }}</td>
-                            <td class="border-x text-center py-2 capitalize">{{ formatDate(booking.checkOut) }}</td>
-                            <td class="border-x text-center py-2 capitalize">{{ booking.days }}</td>
-                            <td class="border-x text-center py-2 capitalize">{{ booking.beds || 0 }} beds</td>
-                            <td class="border-x text-center py-2 capitalize">{{ formatCurrency(booking.totalPrice) }}</td>
-                            <td class="border-x text-center p-1 capitalize">
-                                <button class="px-2 text-white rounded py-1 w-3/4 capitalize" :class="{ 'bg-orange-500': booking.status === 'pending', 'bg-red-700': booking.status === 'canceled', 'bg-red-500': booking.status === 'declined', 'bg-green-500': booking.status === 'confirmed' }">{{ booking.status }}</button>
-                            </td>
-                            <td class="border-x text-center py-2">
-                                <div class="flex items-center gap-x-2 justify-center text-2xl" v-if="booking.status !== 'canceled'">
-                                    <Icon v-if="booking.status !== 'confirmed'" icon="mdi:check" class="text-green-500 cursor-pointer" @click="showConfirmationModal(booking.id, booking.userId)" />
-                                    <Icon icon="mdi:close" class="text-red-500 cursor-pointer" @click="showWarningModal(booking.id, booking.roomNumberId, booking.userId)" />
-                                </div>
-                                <div class="flex items-center gap-x-2 justify-center text-2xl" v-else>
-                                    <Icon icon="mdi:trash" class="text-red-500 cursor-pointer" @click="showDeleteModal(booking.id)" />
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                    <tbody v-else>
-                        <tr>
-                            <td class="border text-center py-2" colspan="11">No rooms to show</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <confirmationModal v-if="showConfirmation" @closeModal="showConfirmation = false" @accept="acceptBooking"/>
-        <warningModal v-if="showWarning" @closeModal="showWarning = false" @accept="declineBooking"/>
-        <deleteModal v-if="showDelete" @closeModal="showDelete = false" @accept="deleteBooking" :type="'booking'"/>
-        <walkInModal v-if="showWalkInModal" @closeModal="showWalkInModal = false" @submit="addWalkInBooking"/>
+  <div class="p-20 !pt-14 space-y-10">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-x-2">
+        <Icon icon="basil:book-mark-outline" class="text-4xl" />
+        <h1 class="text-xl">Booking Lists</h1>
+      </div>
+      <button
+        class="bg-custom-primary px-3 py-1 rounded text-white hover:bg-red-600"
+        @click="showWalkInModal = true"
+      >
+        Walk in
+      </button>
     </div>
+    <div class="bg-white w-full h-fit p-5 rounded-lg shadow space-y-5">
+      <div class="flex justify-start gap-x-2">
+        <select class="border py-1 px-3 rounded" v-model="rowLimit">
+          <option value="5">5 Rows</option>
+          <option value="10">10 Rows</option>
+          <option value="15">15 Rows</option>
+          <option value="20">20 Rows</option>
+          <option value="50">50 Rows</option>
+          <option value="100">100 Rows</option>
+        </select>
+        <select class="border py-1 px-3 rounded" v-model="filterSelect">
+          <option value="">All Bookings</option>
+          <option>Pending</option>
+          <option>Confirmed</option>
+          <option>Canceled</option>
+          <option>Declined</option>
+        </select>
+        <input
+          type="text"
+          placeholder="Search"
+          class="border rounded pl-2 ml-auto"
+          v-model="searchQuery"
+        />
+        <button
+          class="bg-green-500 text-white px-3 rounded"
+          @click="generateCSV"
+        >
+          Generate CSV
+        </button>
+        <!-- <button class="bg-blue-500 px-3 rounded text-white" @click="generateReport">Generate Report</button> -->
+      </div>
+      <div class="w-full overflow-x-auto">
+        <table class="w-[170%] rounded-md overflow-hidden" id="bookingsTable">
+          <thead class="bg-custom-primary text-white">
+            <tr>
+              <th class="border w-fit py-2">Booking At</th>
+              <th class="border w-fit py-2">Booking Id</th>
+              <th class="border w-fit py-2">Type</th>
+              <th class="border w-fit py-2">Name</th>
+              <th class="border w-fit py-2">GCASH Reference</th>
+              <th class="border w-fit py-2">Room Name</th>
+              <th class="border w-fit py-2">Guests</th>
+              <th class="border w-fit py-2">Floor</th>
+              <th class="border w-fit py-2">Room Number</th>
+              <th class="border w-fit py-2">Check In</th>
+              <th class="border w-fit py-2">Check Out</th>
+              <th class="border w-fit py-2">Days</th>
+              <th class="border w-fit py-2">Add Ons</th>
+              <th class="border w-fit py-2">Total Price</th>
+              <th class="border w-fit py-2">Status</th>
+              <th class="border w-fit py-2">Action</th>
+            </tr>
+          </thead>
+          <tbody v-if="filteredBookings()?.length">
+            <tr
+              v-for="(booking, index) in filteredBookings()"
+              :key="booking.id"
+              :class="{ 'bg-gray-100': index % 2 === 0 }"
+              class="border-b"
+            >
+              <td class="border-x text-center py-2 capitalize">
+                {{ formatFirebaseTimestamp(booking.bookedAt) }}
+              </td>
+              <td class="border-x text-center py-2 capitalize">
+                {{ booking.id }}
+              </td>
+              <td class="border-x text-center py-2 capitalize">
+                {{ booking.type || "online" }}
+              </td>
+              <td class="border-x text-center py-2 capitalize">
+                {{ booking.name || booking.firstName + " " + booking.lastName }}
+              </td>
+              <td class="border-x text-center py-2 capitalize">
+                {{ booking.referenceNumber || "--" }}
+              </td>
+              <td class="border-x text-center py-2 capitalize">
+                {{ booking.roomName }}
+              </td>
+              <td class="border-x text-center py-2 capitalize">
+                {{ booking.guests }}
+              </td>
+              <td class="border-x text-center py-2 capitalize">
+                {{ booking.floor }}
+              </td>
+              <td class="border-x text-center py-2 capitalize">
+                {{ booking.number }}
+              </td>
+              <td class="border-x text-center py-2 capitalize">
+                {{ formatDate(booking.checkIn) }}
+              </td>
+              <td class="border-x text-center py-2 capitalize">
+                {{ formatDate(booking.checkOut) }}
+              </td>
+              <td class="border-x text-center py-2 capitalize">
+                {{ booking.days }}
+              </td>
+              <td class="border-x text-center py-2 capitalize">
+                {{ booking.beds || 0 }} beds
+              </td>
+              <td class="border-x text-center py-2 capitalize">
+                {{ formatCurrency(booking.totalPrice) }}
+              </td>
+              <td class="border-x text-center p-1 capitalize">
+                <button
+                  class="px-2 text-white rounded py-1 w-3/4 capitalize"
+                  :class="{
+                    'bg-orange-500': booking.status === 'pending',
+                    'bg-red-700': booking.status === 'canceled',
+                    'bg-red-500': booking.status === 'declined',
+                    'bg-green-500': booking.status === 'confirmed',
+                  }"
+                >
+                  {{ booking.status }}
+                </button>
+              </td>
+              <td class="border-x text-center py-2">
+                <div
+                  class="flex items-center gap-x-2 justify-center text-2xl"
+                  v-if="booking.status !== 'canceled'"
+                >
+                  <Icon
+                    v-if="booking.status !== 'confirmed'"
+                    icon="mdi:check"
+                    class="text-green-500 cursor-pointer"
+                    @click="showConfirmationModal(booking.id, booking.userId)"
+                  />
+                  <Icon
+                    icon="mdi:close"
+                    class="text-red-500 cursor-pointer"
+                    @click="
+                      showWarningModal(
+                        booking.id,
+                        booking.roomNumberId,
+                        booking.userId
+                      )
+                    "
+                  />
+                </div>
+                <div
+                  class="flex items-center gap-x-2 justify-center text-2xl"
+                  v-else
+                >
+                  <Icon
+                    icon="mdi:trash"
+                    class="text-red-500 cursor-pointer"
+                    @click="showDeleteModal(booking.id)"
+                  />
+                </div>
+              </td>
+            </tr>
+          </tbody>
+          <tbody v-else>
+            <tr>
+              <td class="border text-center py-2" colspan="11">
+                No rooms to show
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <confirmationModal
+      v-if="showConfirmation"
+      @closeModal="showConfirmation = false"
+      @accept="acceptBooking"
+    />
+    <warningModal
+      v-if="showWarning"
+      @closeModal="showWarning = false"
+      @accept="declineBooking"
+    />
+    <deleteModal
+      v-if="showDelete"
+      @closeModal="showDelete = false"
+      @accept="deleteBooking"
+      :type="'booking'"
+    />
+    <walkInModal
+      v-if="showWalkInModal"
+      @closeModal="showWalkInModal = false"
+      @submit="addWalkInBooking"
+    />
+  </div>
 </template>
 
 <script setup>
@@ -106,7 +208,7 @@ import { onMounted, ref, computed } from 'vue'
 import { useDataStore } from '../store'
 import moment from 'moment'
 import { db } from '../config/firebaseConfig'
-import { doc, updateDoc, deleteDoc, addDoc, collection } from 'firebase/firestore'
+import { doc, updateDoc, deleteDoc, addDoc, collection, getDocs, query, or, where } from 'firebase/firestore'
 import { useToast } from 'vue-toast-notification'
 import 'vue-toast-notification/dist/theme-sugar.css'
 import jsPDF from 'jspdf'
@@ -145,7 +247,7 @@ const filteredBookings = () => {
     if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase()
         filtered = filtered.filter(booking => {
-            return Object.values(booking).some(value => 
+            return Object.values(booking).some(value =>
                 String(value).toLowerCase().includes(query)
             )
         })
@@ -168,7 +270,7 @@ function formatFirebaseTimestamp(firebaseTimestamp) {
     return moment(milliseconds).format('lll');
 }
 
-// accept booking 
+// accept booking
 const showConfirmation = ref(false)
 const bookingToAccept = ref('')
 const userToAccept = ref('')
@@ -180,6 +282,7 @@ const showConfirmationModal = (bookingId, userId) => {
 }
 
 const userNotifRefAccept = collection(db, 'userNotifications')
+const itemRef = collection(db, 'items')
 
 const acceptBooking = async () => {
     try {
@@ -195,14 +298,42 @@ const acceptBooking = async () => {
         })
 
         $toast.success('Accepted Booking Successfully')
+        showConfirmation.value = false
+
+        const querySnapshot = query(
+            itemRef,
+            or(
+                where('name', '==', 'Shampoo'),
+                where('name', '==', 'Soap'),
+                where('name', '==', 'Toothpaste'),
+                where('name', '==', 'Toothbrush'),
+                where('name', '==', 'tissue'),
+                where('name', '==', 'Towel'),
+                where('name', '==', 'Blankets'),
+                where('name', '==', 'Pillow'),
+            )
+        )
+
+        const snapshots = await getDocs(querySnapshot)
+
+        for (const snapshot of snapshots.docs) { 
+            const docRef = doc(itemRef, snapshot.id);
+            const currentQuantity = snapshot.data().quantity;
+
+            if (currentQuantity > 0) {
+                await updateDoc(docRef, {
+                    quantity: currentQuantity - 1
+                });
+            }
+        }
     } catch (error) {
         console.log(error)
         $toast.error('Failed to accept booking')
     } finally {
         bookingToAccept.value = ''
-        showConfirmation.value = false
     }
 }
+    
 
 // decline booking
 const showWarning = ref(false)
@@ -278,7 +409,7 @@ const generateCSV = () => {
 
     rows.forEach((row) => {
         let rowData = [];
-        let cols = row.querySelectorAll('td:not(:last-child), th:not(:last-child)'); 
+        let cols = row.querySelectorAll('td:not(:last-child), th:not(:last-child)');
 
         cols.forEach((col) => {
             let cellText = col.innerText.trim();
@@ -301,7 +432,7 @@ const generateCSV = () => {
 };
 
 
-// add walkin 
+// add walkin
 const bookingRef = collection(db, 'booking')
 const showWalkInModal = ref(false)
 
