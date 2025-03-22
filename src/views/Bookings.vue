@@ -37,9 +37,9 @@
         />
         <button
           class="bg-green-500 text-white px-3 rounded"
-          @click="generateCSV"
+          @click="generatePDF"
         >
-          Generate CSV
+          Generate PDF
         </button>
         <!-- <button class="bg-blue-500 px-3 rounded text-white" @click="generateReport">Generate Report</button> -->
       </div>
@@ -401,11 +401,40 @@ const deleteBooking = async () => {
     }
 }
 
-// generate csv
-const generateCSV = () => {
+// generate pdf
+const generatePDF = () => {
+    const doc = new jsPDF();
+    const headerText = "Best Fortune Hotel"; 
+    const headerAddressLine1 = "805-807 Benavidez St.";
+    const headerAddressLine2 = "cor Salazar St. Binondo, Manila, Philippines"; 
+    const headerPhone = "0915 595 9227"; 
+    const headerEmail = "bestfortunehotel@yahoo.com"; 
+    const headerImage = "src/assets/277741668_347625477389163_2974931926985871192_n-removebg-preview.png"; 
+
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const imageWidth = 25;
+    const imageX = (pageWidth - imageWidth) / 2;
+
+    doc.addImage(headerImage, 'PNG', imageX, 10, imageWidth, 25);
+
+    doc.setFontSize(18);
+    doc.text(headerText, pageWidth / 2, 40, { align: 'center' });
+
+    doc.setFontSize(12);
+    doc.text(headerAddressLine1, pageWidth / 2, 45, { align: 'center' });
+
+    doc.setFontSize(12);
+    doc.text(headerAddressLine2, pageWidth / 2, 50, { align: 'center' });
+
+    doc.setFontSize(12);
+    doc.text(headerPhone, pageWidth / 2, 55, { align: 'center' });
+
+    doc.setFontSize(12);
+    doc.text(headerEmail, pageWidth / 2, 60, { align: 'center' });
+
     let table = document.getElementById('bookingsTable');
     let rows = table.querySelectorAll('tr');
-    let csvContent = '';
+    let data = [];
 
     rows.forEach((row) => {
         let rowData = [];
@@ -413,24 +442,22 @@ const generateCSV = () => {
 
         cols.forEach((col) => {
             let cellText = col.innerText.trim();
-            rowData.push(`"${cellText.replace(/"/g, '""')}"`);
+            rowData.push(cellText);
         });
 
         if (rowData.length > 0) {
-            csvContent += rowData.join(',') + '\n';
+            data.push(rowData);
         }
     });
 
-    let blob = new Blob([csvContent], { type: 'text/csv' });
-    let link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'Bookings.csv';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(link.href);
-};
+    doc.autoTable({
+        head: [data[0]],
+        body: data.slice(1),
+        startY: 70,
+    });
 
+    doc.save('Bookings.pdf');
+};
 
 // add walkin
 const bookingRef = collection(db, 'booking')
