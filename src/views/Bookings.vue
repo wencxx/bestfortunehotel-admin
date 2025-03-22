@@ -1,8 +1,11 @@
 <template>
     <div class="p-20 !pt-14 space-y-10">
-        <div class="flex gap-x-2 items-center">
-            <Icon icon="basil:book-mark-outline" class="text-4xl" />
-            <h1 class="text-xl">Booking Lists</h1>
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-x-2">
+                <Icon icon="basil:book-mark-outline" class="text-4xl" />
+                <h1 class="text-xl">Booking Lists</h1>
+            </div>
+            <button class="bg-custom-primary px-3 py-1 rounded text-white hover:bg-red-600" @click="showWalkInModal = true">Walk in</button>
         </div>
         <div class="bg-white w-full h-fit p-5 rounded-lg shadow space-y-5">
             <div class="flex justify-start gap-x-2">
@@ -31,6 +34,7 @@
                         <tr>
                             <th class="border w-fit py-2">Booking At</th>
                             <th class="border w-fit py-2">Booking Id</th>
+                            <th class="border w-fit py-2">Type</th>
                             <th class="border w-fit py-2">Name</th>
                             <th class="border w-fit py-2">GCASH Reference</th>
                             <th class="border w-fit py-2">Room Name</th>
@@ -50,8 +54,9 @@
                         <tr v-for="(booking, index) in filteredBookings()" :key="booking.id" :class="{ 'bg-gray-100': index % 2 === 0 }" class="border-b">
                             <td class="border-x text-center py-2 capitalize">{{ formatFirebaseTimestamp(booking.bookedAt) }}</td>
                             <td class="border-x text-center py-2 capitalize">{{ booking.id }}</td>
-                            <td class="border-x text-center py-2 capitalize">{{ booking.firstName + ' ' + booking.lastName }}</td>
-                            <td class="border-x text-center py-2 capitalize">{{ booking.referenceNumber }}</td>
+                            <td class="border-x text-center py-2 capitalize">{{ booking.type || 'online' }}</td>
+                            <td class="border-x text-center py-2 capitalize">{{ booking.name || booking.firstName + ' ' + booking.lastName }}</td>
+                            <td class="border-x text-center py-2 capitalize">{{ booking.referenceNumber || '--' }}</td>
                             <td class="border-x text-center py-2 capitalize">{{ booking.roomName }}</td>
                             <td class="border-x text-center py-2 capitalize">{{ booking.guests }}</td>
                             <td class="border-x text-center py-2 capitalize">{{ booking.floor }}</td>
@@ -67,7 +72,7 @@
                             <td class="border-x text-center py-2">
                                 <div class="flex items-center gap-x-2 justify-center text-2xl" v-if="booking.status !== 'canceled'">
                                     <Icon v-if="booking.status !== 'confirmed'" icon="mdi:check" class="text-green-500 cursor-pointer" @click="showConfirmationModal(booking.id)" />
-                                    <Icon icon="mdi:close" class="text-red-500 cursor-pointer" @click="showWarningModal(booking.id, booking.roomNumberId)" />
+                                    <Icon icon="mdi:close" class="text-red-500 cursor-pointer" @click="showWarningModal(booking.id, booking.roomNumberId, booking.userId)" />
                                 </div>
                                 <div class="flex items-center gap-x-2 justify-center text-2xl" v-else>
                                     <Icon icon="mdi:trash" class="text-red-500 cursor-pointer" @click="showDeleteModal(booking.id)" />
@@ -87,6 +92,7 @@
         <confirmationModal v-if="showConfirmation" @closeModal="showConfirmation = false" @accept="acceptBooking"/>
         <warningModal v-if="showWarning" @closeModal="showWarning = false" @accept="declineBooking"/>
         <deleteModal v-if="showDelete" @closeModal="showDelete = false" @accept="deleteBooking" :type="'booking'"/>
+        <walkInModal v-if="showWalkInModal" @closeModal="showWalkInModal = false" @submit="addWalkInBooking"/>
     </div>
 </template>
 
@@ -94,12 +100,13 @@
 import confirmationModal from '../components/ConfirmationModal.vue'
 import warningModal from '../components/WarningModal.vue'
 import deleteModal from '../components/DeleteModal.vue'
+import walkInModal from '../components/WalkInModal.vue'
 import AddRoom from '../components/AddRoom.vue'
 import { onMounted, ref, computed } from 'vue'
 import { useDataStore } from '../store'
 import moment from 'moment'
 import { db } from '../config/firebaseConfig'
-import { doc, updateDoc, deleteDoc } from 'firebase/firestore'
+import { doc, updateDoc, deleteDoc, addDoc, collection } from 'firebase/firestore'
 import { useToast } from 'vue-toast-notification'
 import 'vue-toast-notification/dist/theme-sugar.css'
 import jsPDF from 'jspdf'
@@ -189,13 +196,17 @@ const acceptBooking = async () => {
 // decline booking
 const showWarning = ref(false)
 const bookingToDecline = ref('')
+const userIdToDecline = ref('')
 const roomNumberIdToDecline = ref('')
 
-const showWarningModal = (bookingId, roomNumberId) => {
+const showWarningModal = (bookingId, roomNumberId, userId) => {
     bookingToDecline.value = bookingId
     roomNumberIdToDecline.value = roomNumberId
+    userIdToDecline.value = userId
     showWarning.value = true
 }
+
+const userNotifRef = collection(db, 'userNotifications')
 
 const declineBooking = async (data) => {
     try {
@@ -206,6 +217,13 @@ const declineBooking = async (data) => {
 
         await updateDoc(doc(db, 'roomNumbers', roomNumberIdToDecline.value), {
             roomStatus: 'Available'
+        })
+
+        await addDoc(userNotifRef, {
+            notifications: data,
+            isRead: false,
+            isFalse: false,
+            userId: userIdToDecline.value || 'HAHAHAH'
         })
 
         $toast.success('Declined Booking Successfully')
@@ -271,4 +289,26 @@ const generateCSV = () => {
     URL.revokeObjectURL(link.href);
 };
 
+
+// add walkin 
+const bookingRef = collection(db, 'booking')
+const showWalkInModal = ref(false)
+
+const addWalkInBooking = async (walkInData) => {
+    try {
+        const newBooking = {
+            bookedAt: new Date(),
+            ...walkInData,
+            type: 'walkin',
+            status: 'confirmed'
+        }
+        await addDoc(bookingRef, newBooking)
+        $toast.success('Walk-in Booking Added Successfully')
+    } catch (error) {
+        console.log(error)
+        $toast.error('Failed to add walk-in booking')
+    } finally {
+        showWalkInModal.value = false
+    }
+}
 </script>
