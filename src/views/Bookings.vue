@@ -71,7 +71,7 @@
                             </td>
                             <td class="border-x text-center py-2">
                                 <div class="flex items-center gap-x-2 justify-center text-2xl" v-if="booking.status !== 'canceled'">
-                                    <Icon v-if="booking.status !== 'confirmed'" icon="mdi:check" class="text-green-500 cursor-pointer" @click="showConfirmationModal(booking.id)" />
+                                    <Icon v-if="booking.status !== 'confirmed'" icon="mdi:check" class="text-green-500 cursor-pointer" @click="showConfirmationModal(booking.id, booking.userId)" />
                                     <Icon icon="mdi:close" class="text-red-500 cursor-pointer" @click="showWarningModal(booking.id, booking.roomNumberId, booking.userId)" />
                                 </div>
                                 <div class="flex items-center gap-x-2 justify-center text-2xl" v-else>
@@ -171,16 +171,27 @@ function formatFirebaseTimestamp(firebaseTimestamp) {
 // accept booking 
 const showConfirmation = ref(false)
 const bookingToAccept = ref('')
+const userToAccept = ref('')
 
-const showConfirmationModal = (bookingId) => {
+const showConfirmationModal = (bookingId, userId) => {
     bookingToAccept.value = bookingId
     showConfirmation.value = true
+    userToAccept.value = userId
 }
+
+const userNotifRefAccept = collection(db, 'userNotifications')
 
 const acceptBooking = async () => {
     try {
         await updateDoc(doc(db, 'booking', bookingToAccept.value), {
             status: 'confirmed'
+        })
+
+        await addDoc(userNotifRefAccept, {
+            notifications: 'The hotel accepted your booking',
+            isRead: false,
+            isFalse: false,
+            userId: userToAccept.value || 'Admin'
         })
 
         $toast.success('Accepted Booking Successfully')
@@ -220,10 +231,10 @@ const declineBooking = async (data) => {
         })
 
         await addDoc(userNotifRef, {
-            notifications: data,
+            notifications: `Booking declined: ${data}`,
             isRead: false,
             isFalse: false,
-            userId: userIdToDecline.value || 'HAHAHAH'
+            userId: userIdToDecline.value || 'Admin'
         })
 
         $toast.success('Declined Booking Successfully')
