@@ -1,8 +1,11 @@
 <template>
     <div class="p-20 !pt-14 space-y-10">
-        <div class="flex gap-x-2 items-center">
-            <Icon icon="basil:book-mark-outline" class="text-4xl" />
-            <h1 class="text-xl">Booking Lists</h1>
+        <div class="flex justify-between">
+            <div class="flex gap-x-2 items-center">
+                <Icon icon="basil:book-mark-outline" class="text-4xl" />
+                <h1 class="text-xl">Booking Lists</h1>
+            </div>
+            <button class="bg-blue-500 text-white rounded px-3 text-sm">Add Walk In</button>
         </div>
         <div class="bg-white w-full h-fit p-5 rounded-lg shadow space-y-5">
             <div class="flex justify-start gap-x-2">
