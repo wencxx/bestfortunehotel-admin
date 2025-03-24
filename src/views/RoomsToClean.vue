@@ -27,6 +27,7 @@
                         <tr>
                             <th class="border w-2/5 py-2">Room</th>
                             <th class="border w-1/5 py-2">Status</th>
+                            <th class="border w-1/5 py-2">Assigned Staff</th>
                             <th class="border w-1/5 py-2">Action</th>
                         </tr>
                     </thead>
@@ -38,18 +39,30 @@
                                     <span>{{ item.cleaned ? 'Cleaned' : 'To Clean' }}</span>
                                 </div>
                             </td>
+                            <td class="border-x text-center py-2 capitalize px-2">
+                                <div v-if="item.assignedStaffs && item.assignedStaffs.length">
+                                    <span v-for="staffId in item.assignedStaffs" :key="staffId" class="block" >
+                                        <p class="text-sm cursor-pointer" @click="removeStaff(item.id, staffId, index)">{{ getStaffName(staffId) }}</p>
+                                    </span>
+                                </div>
+                                <div v-else>--</div>
+                            </td>
                             <td class="border-x text-center py-2">
                                 <div class="flex items-center gap-x-2 justify-center text-2xl">
                                     <Icon v-if="!item.cleaned" icon="mdi:check" class="text-green-500" @click="updateRoom(item.id, index, 'done')" />
                                     <Icon v-else icon="mdi:restore" class="text-orange-500" @click="updateRoom(item.id, index, 'restore')" />
                                     <Icon icon="mdi:trash" class="text-red-500" @click="deleteRoom(item.id, index)" />
+                                    <select class="border py-1 px-3 rounded text-xs" v-model="tempSelectedStaff[index]" @change="assignStaff(item.id, tempSelectedStaff[index], index)">
+                                        <option value="" disabled>Assign Staff</option>
+                                        <option v-for="staff in staffs" :key="staff.id" :value="staff.id">{{ staff.fullName }}</option>
+                                    </select>
                                 </div>
                             </td>
                         </tr>
                     </tbody>
                     <tbody v-else>
                         <tr>
-                            <td colspan="3" class="border text-center py-2 capitalize px-2">No rooms to clean</td>
+                            <td colspan="4" class="border text-center py-2 capitalize px-2">No rooms to clean</td>
                         </tr>
                     </tbody>
                 </table>
@@ -73,19 +86,39 @@ const $toast = useToast()
 
 onMounted(() => {
     getRoomsToClean()
+    getStaffs()
 })
 
 // get roomsToClean
 const rtcRef = collection(db, 'roomsToClean')
+const staffsRef = collection(db, 'staffs')
 
 const roomsToClean = ref([])
+const staffs = ref([])
+const tempSelectedStaff = ref([])
 
 const getRoomsToClean = async () => {
     try {
         const snapshots = await getDocs(rtcRef)
-
         snapshots.docs.forEach(doc => {
+            const data = doc.data()
             roomsToClean.value.push({
+                id: doc.id,
+                ...data,
+                assignedStaffs: data.assignedStaffs || []
+            })
+            tempSelectedStaff.value.push('')
+        })
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+const getStaffs = async () => {
+    try {
+        const snapshots = await getDocs(staffsRef)
+        snapshots.docs.forEach(doc => {
+            staffs.value.push({
                 id: doc.id,
                 ...doc.data()
             })
@@ -98,6 +131,7 @@ const getRoomsToClean = async () => {
 const filterSelect = ref('')
 const searchQuery = ref('')
 const rowLimit = ref(5)
+const selectedStaff = ref('')
 
 const filteredRoom = () => {
     let filtered = roomsToClean.value
@@ -122,6 +156,10 @@ const filteredRoom = () => {
     return filtered.slice(0, rowLimit.value)
 }
 
+const getStaffName = (staffId) => {
+    const staff = staffs.value.find(staff => staff.id === staffId)
+    return staff ? staff.fullName : 'Unknown'
+}
 
 // update room
 const updateRoom = async (itemId, index, type) => {
@@ -148,7 +186,40 @@ const updateRoom = async (itemId, index, type) => {
     }
 }
 
-// delete room
+// assign staff to room
+const assignStaff = async (roomId, staffId, index) => {
+    try {
+        const room = roomsToClean.value[index]
+        if (!room.assignedStaffs.includes(staffId)) {
+            room.assignedStaffs.push(staffId)
+            await updateDoc(doc(db, 'roomsToClean', roomId), {
+                assignedStaffs: room.assignedStaffs
+            })
+            $toast.success('Staff assigned successfully')
+        } else {
+            $toast.warning('Staff already assigned')
+        }
+    } catch (error) {
+        console.log('Failed to assign staff')
+        $toast.error('Failed to assign staff')
+    }
+}
+
+// remove staff from room
+const removeStaff = async (roomId, staffId, index) => {
+    try {
+        const room = roomsToClean.value[index]
+        room.assignedStaffs = room.assignedStaffs.filter(id => id !== staffId)
+        await updateDoc(doc(db, 'roomsToClean', roomId), {
+            assignedStaffs: room.assignedStaffs
+        })
+        $toast.success('Staff removed successfully')
+    } catch (error) {
+        console.log('Failed to remove staff')
+        $toast.error('Failed to remove staff')
+    }
+}
+
 // delete room
 const willDeleteRoom = ref(false)
 const roomToDeleteId = ref('')
