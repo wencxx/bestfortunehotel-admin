@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-white border-r py-5 space-y-10">
+    <div class="bg-white border-r py-5 space-y-10 h-screen overflow-y-auto">
         <div class="flex items-center justify-center gap-x-3">
             <img src="../assets/277741668_347625477389163_2974931926985871192_n-removebg-preview.png" class="w-14 aspect-square" />
             <h1 class="font-medium text-xl">BFH - Admin</h1>

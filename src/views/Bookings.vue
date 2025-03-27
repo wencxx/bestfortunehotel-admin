@@ -225,6 +225,7 @@ import { useToast } from 'vue-toast-notification'
 import 'vue-toast-notification/dist/theme-sugar.css'
 import jsPDF from 'jspdf'
 import 'jspdf-autotable'
+import headerImage from '../assets/277741668_347625477389163_2974931926985871192_n-removebg-preview.png'
 
 const $toast = useToast()
 
@@ -421,7 +422,6 @@ const generatePDF = () => {
     const headerAddressLine2 = "cor Salazar St. Binondo, Manila, Philippines"; 
     const headerPhone = "0915 595 9227"; 
     const headerEmail = "bestfortunehotel@yahoo.com"; 
-    const headerImage = "src/assets/277741668_347625477389163_2974931926985871192_n-removebg-preview.png"; 
 
     const pageWidth = doc.internal.pageSize.getWidth();
     const imageWidth = 25;
