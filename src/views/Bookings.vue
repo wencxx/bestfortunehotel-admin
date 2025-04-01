@@ -243,31 +243,38 @@ const searchQuery = ref('')
 const rowLimit = ref('5')
 
 const filteredBookings = () => {
-    let filtered = bookings.value
+    let filtered = bookings.value;
 
     if (filterSelect.value) {
         if (filterSelect.value === 'Pending') {
-            filtered = filtered.filter(booking => booking.status === 'pending')
+            filtered = filtered.filter(booking => booking.status === 'pending');
         } else if (filterSelect.value === 'Canceled') {
-            filtered = filtered.filter(booking => booking.status === 'canceled')
+            filtered = filtered.filter(booking => booking.status === 'canceled');
         } else if (filterSelect.value === 'Confirmed') {
-            filtered = filtered.filter(booking => booking.status === 'confirmed')
+            filtered = filtered.filter(booking => booking.status === 'confirmed');
         } else if (filterSelect.value === 'Declined') {
-            filtered = filtered.filter(booking => booking.status === 'declined')
+            filtered = filtered.filter(booking => booking.status === 'declined');
         }
     }
 
     if (searchQuery.value) {
-        const query = searchQuery.value.toLowerCase()
+        const query = searchQuery.value.toLowerCase();
         filtered = filtered.filter(booking => {
             return Object.values(booking).some(value =>
                 String(value).toLowerCase().includes(query)
-            )
-        })
+            );
+        });
     }
 
-    return filtered.slice(0, rowLimit.value)
-}
+    // Sort pending bookings to the top
+    filtered.sort((a, b) => {
+        if (a.status === 'pending' && b.status !== 'pending') return -1;
+        if (a.status !== 'pending' && b.status === 'pending') return 1;
+        return 0;
+    });
+
+    return filtered.slice(0, rowLimit.value);
+};
 
 const formatCurrency = (price) => {
     return `₱ ${new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'PHP', currencyDisplay: 'code' }).format(Number(price)).replace('PHP', '')}`

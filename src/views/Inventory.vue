@@ -22,8 +22,8 @@
                     <option>In Stock</option>
                     <option>Low Stock</option>
                 </select>
-                <input type="text" placeholder="Search" class="border rounded pl-2 ml-auto" v-model="searchQuery">
-                <button class="bg-green-500 text-white px-3 rounded" @click="generateCSV">Generate CSV</button>
+                <!-- <input type="text" placeholder="Search" class="border rounded pl-2 ml-auto" v-model="searchQuery"> -->
+                <button class="bg-green-500 text-white px-3 rounded ml-auto" @click="generateCSV">Generate CSV</button>
             </div>
             <div class="full overflow-x-auto">
                 <table class="w-full rounded-md overflow-hidden" id="inventoryTable">
