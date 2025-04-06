@@ -44,7 +44,11 @@
             </router-link>
             <router-link :to="{ name: 'inventory' }" class="flex items-center gap-x-2 px-4 py-3">
                 <Icon icon="material-symbols-light:inventory-rounded" class="text-3xl" />
-                <span class="text-xl">Inventory</span>
+                <span class="text-xl">Reusable Inventory</span>
+            </router-link>
+            <router-link :to="{ name: 'stockInventory' }" class="flex items-center gap-x-2 px-4 py-3">
+                <Icon icon="material-symbols-light:inventory-rounded" class="text-3xl" />
+                <span class="text-xl">Room Stock Inventory</span>
             </router-link>
         </nav>
 

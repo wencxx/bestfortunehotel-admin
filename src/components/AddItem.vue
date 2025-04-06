@@ -25,6 +25,9 @@ import { db, storage } from '../config/firebaseConfig'
 import { addDoc, collection } from 'firebase/firestore'
 
 const emit = defineEmits(['closeModal'])
+const { type } = defineProps({
+  type: String
+})
 
 const closeModal = () => {
     emit('closeModal')
@@ -48,6 +51,7 @@ const addItem = async () => {
     const itemData = {
       name: itemDetails.value.name,
       quantity: itemDetails.value.quantity,
+      type,
       createdAt: new Date()
     }
 

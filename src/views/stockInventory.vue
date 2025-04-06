@@ -2,7 +2,7 @@
     <div class="p-20 !pt-14 space-y-10">
         <div class="flex gap-x-2 items-center">
             <Icon icon="material-symbols-light:inventory-rounded" class="text-4xl" />
-            <h1 class="text-xl">Reusable Inventory</h1>
+            <h1 class="text-xl">Room Stock Inventory</h1>
         </div>
         <div class="flex">
             <button class="ml-auto border border-custom-primary text-custom-primary px-3 py-1 rounded hover:shadow-md" @click="willAddItem = true">Add Item</button>
@@ -61,7 +61,7 @@
             </div>
         </div>
 
-        <AddItem v-if="willAddItem" @closeModal="closeModal" type='reusable' />
+        <AddItem v-if="willAddItem" @closeModal="closeModal" type='stock' />
         <EditItem v-if="willEditItem" @closeModal="closeEditModal" :itemDetailsToEdit="itemToEditDetails" />
         <DeleteModal v-if="willDeleteItem" :type="'Item'" @closeModal="willDeleteItem = false" @accept="confirmDelete" />
     </div>
@@ -120,7 +120,7 @@ const getItems = async () => {
     try {
         const q = query(
             itemsRef,
-            where('type', '==', 'reusable')
+            where('type', '==', 'stock')
         )
         const snapshots = await getDocs(q)
 
