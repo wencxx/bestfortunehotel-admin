@@ -23,7 +23,7 @@
                     <option>Occupied</option>
                 </select> -->
                 <!-- <input type="text" placeholder="Search" class="border rounded pl-2 ml-auto" v-model="searchQuery"> -->
-                <button class="bg-green-500 text-white px-3 rounded ml-auto" @click="generateCSV">Generate CSV</button>
+                <button class="bg-green-500 text-white px-3 rounded ml-auto" @click="generatePDF">Generate PDF</button>
             </div>
             <div class="full overflow-x-auto">
                 <table class="w-[120%] rounded-md overflow-hidden" id="roomsTable">
@@ -80,6 +80,9 @@ import { db } from '../config/firebaseConfig'
 import { collection, getDocs, doc, deleteDoc } from 'firebase/firestore'
 import { useToast } from 'vue-toast-notification'
 import 'vue-toast-notification/dist/theme-sugar.css'
+import jsPDF from 'jspdf'
+import 'jspdf-autotable'
+import headerImage from '../assets/277741668_347625477389163_2974931926985871192_n-removebg-preview.png'
 
 const $toast = useToast()
 
@@ -193,34 +196,63 @@ const confirmDelete = async () => {
     }
 }
 
-// generate csv
-const generateCSV = () => {
+// generate pdf
+const generatePDF = () => {
+    const doc = new jsPDF();
+    const headerText = "Best Fortune Hotel"; 
+    const headerAddressLine1 = "805-807 Benavidez St.";
+    const headerAddressLine2 = "cor Salazar St. Binondo, Manila, Philippines"; 
+    const headerPhone = "0915 595 9227"; 
+    const headerEmail = "bestfortunehotel@yahoo.com"; 
+
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const imageWidth = 25;
+    const imageX = (pageWidth - imageWidth) / 2;
+
+    doc.addImage(headerImage, 'PNG', imageX, 10, imageWidth, 25);
+
+    doc.setFontSize(18);
+    doc.text(headerText, pageWidth / 2, 40, { align: 'center' });
+
+    doc.setFontSize(12);
+    doc.text(headerAddressLine1, pageWidth / 2, 45, { align: 'center' });
+
+    doc.setFontSize(12);
+    doc.text(headerAddressLine2, pageWidth / 2, 50, { align: 'center' });
+
+    doc.setFontSize(12);
+    doc.text(headerPhone, pageWidth / 2, 55, { align: 'center' });
+
+    doc.setFontSize(12);
+    doc.text(headerEmail, pageWidth / 2, 60, { align: 'center' });
+
     let table = document.getElementById('roomsTable');
     let rows = table.querySelectorAll('tr');
-    let csvContent = '';
+    let data = [];
 
     rows.forEach((row) => {
         let rowData = [];
-        let cols = row.querySelectorAll('td:not(:last-child), th:not(:last-child)'); 
+        let cols = row.querySelectorAll('td, th');
 
-        cols.forEach((col) => {
-            let cellText = col.innerText.trim();
-            rowData.push(`"${cellText.replace(/"/g, '""')}"`);
-        });
+        // Only loop through all columns except the last
+        for (let i = 0; i < cols.length - 1; i++) {
+            let cellText = cols[i].innerText.trim();
+            rowData.push(cellText);
+        }
 
         if (rowData.length > 0) {
-            csvContent += rowData.join(',') + '\n';
+            data.push(rowData);
         }
     });
 
-    let blob = new Blob([csvContent], { type: 'text/csv' });
-    let link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'Rooms.csv';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(link.href);
+
+    doc.autoTable({
+        head: [data[0]],
+        body: data.slice(1),
+        startY: 70,
+    });
+
+    doc.save('Roomtypes.pdf');
 };
 
 </script>
