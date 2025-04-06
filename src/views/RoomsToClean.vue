@@ -19,7 +19,7 @@
                     <option>Cleaned</option>
                     <option>To Clean</option>
                 </select>
-                <input type="text" placeholder="Search" class="border rounded pl-2 ml-auto" v-model="searchQuery">
+                <!-- <input type="text" placeholder="Search" class="border rounded pl-2 ml-auto" v-model="searchQuery"> -->
             </div>
             <div class="full overflow-x-auto">
                 <table class="w-full rounded-md overflow-hidden">
@@ -42,7 +42,7 @@
                             <td class="border-x text-center py-2 capitalize px-2">
                                 <div v-if="item.assignedStaffs && item.assignedStaffs.length">
                                     <span v-for="staffId in item.assignedStaffs" :key="staffId" class="block" >
-                                        <p class="text-sm cursor-pointer" @click="removeStaff(item.id, staffId, index)">{{ getStaffName(staffId) }}</p>
+                                        <p class="text-sm cursor-pointer" @click="removeStaff(item.id, staffId, index)">{{ getStaffName(staffId) }}</p>  
                                     </span>
                                 </div>
                                 <div v-else>--</div>

@@ -17,13 +17,17 @@
                     <option value="50">50 Rows</option>
                     <option value="100">100 Rows</option>
                 </select>
-                <!-- <select class="border py-1 px-3 rounded" v-model="filterSelect">
-                    <option value="">All</option>
-                    <option>Available</option>
-                    <option>Occupied</option>
-                </select> -->
+                <select class="border py-1 px-3 rounded" v-model="filterSelect">
+                    <option value="">All Status</option>
+                    <option value="Available">Available</option>
+                    <option value="Unavailable">Unavailable</option>
+                </select>
+                <select class="border py-1 px-3 rounded" v-model="filterRoomTypeSelect">
+                    <option value="">All Room Types</option>
+                    <option v-for="type in roomTypes" :key="type.id" :value="type.id">{{ type.roomName }}</option>
+                </select>
                 <input type="text" placeholder="Search" class="border rounded pl-2 ml-auto" v-model="searchQuery">
-                <button class="bg-green-500 text-white px-3 rounded" @click="generateCSV">Generate CSV</button>
+                <button class="bg-green-500 text-white px-3 rounded ml-auto" @click="generateCSV">Generate CSV</button>
             </div>
             <div class="full overflow-x-auto">
                 <table class="w-[120%] rounded-md overflow-hidden" id="roomsTable">
@@ -87,6 +91,7 @@ onMounted(() => {
 const rooms = ref([])
 
 const filterSelect = ref('')
+const filterRoomTypeSelect = ref('')
 const searchQuery = ref('')
 const rowLimit = ref(5)
 
@@ -95,12 +100,14 @@ const filteredRoom = () => {
 
     if (filterSelect.value) {
         if (filterSelect.value === 'Available') {
-            filtered = filtered.filter(room => room.isAvailable === true)
-        } else if (filterSelect.value === 'Occupied') {
-            filtered = filtered.filter(room => room.isAvailable === false)
-        } else if (filterSelect.value === 'Occupied') {
-            filtered = filtered.filter(room => room.isAvailable === false)
+            filtered = filtered.filter(room => room.roomStatus === 'Available')
+        } else if (filterSelect.value === 'Unavailable') {
+            filtered = filtered.filter(room => room.roomStatus === 'Unavailable')
         }
+    }
+
+    if (filterRoomTypeSelect.value) {
+        filtered = filtered.filter(room => room.roomType === filterRoomTypeSelect.value)
     }
 
     if (searchQuery.value) {

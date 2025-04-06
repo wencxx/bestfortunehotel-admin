@@ -17,7 +17,7 @@
                     <option value="50">50 Rows</option>
                     <option value="100">100 Rows</option>
                 </select>
-                <input type="text" placeholder="Search" class="border rounded pl-2 ml-auto" v-model="searchQuery">
+                <!-- <input type="text" placeholder="Search" class="border rounded pl-2 ml-auto" v-model="searchQuery"> -->
             </div>
             <div class="full overflow-x-auto">
                 <table class="w-full rounded-md overflow-hidden">
