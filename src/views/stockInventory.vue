@@ -30,6 +30,7 @@
                     <thead class="bg-custom-primary text-white">
                         <tr>
                             <th class="border w-2/5 py-2">Item</th>
+                            <th class="border w-2/5 py-2">Category</th>
                             <th class="border w-1/5 py-2">Quantity</th>
                             <th class="border w-1/5 py-2">Status</th>
                             <th class="border w-1/5 py-2">Action</th>
@@ -38,6 +39,7 @@
                     <tbody v-if="filteredItems()?.length">
                         <tr v-for="(item, index) in filteredItems()" :key="item.id" :class="{ 'bg-gray-100': index % 2 === 0 }" class="border-b">
                             <td class="border-x text-center py-2 capitalize px-2"><span class="line-clamp-3">{{ item.name }}</span></td>
+                            <td class="border-x text-center py-2 capitalize px-2"><span class="line-clamp-3">{{ item.category }}</span></td>
                             <td class="border-x text-center py-2 capitalize px-2"><span class="line-clamp-3">{{ item.quantity }}</span></td>
                             <td class="border-x text-center py-2 capitalize">
                                 <button class="bg-green-500 px-3 rounded text-white" :class="{ 'bg-red-500': item.quantity < 50 }">
@@ -54,7 +56,7 @@
                     </tbody>
                     <tbody v-else>
                         <tr>
-                            <td class="border text-center py-2" colspan="4">No items to show</td>
+                            <td class="border text-center py-2" colspan="5">No items to show</td>
                         </tr>
                     </tbody>
                 </table>

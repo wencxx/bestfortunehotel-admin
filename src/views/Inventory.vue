@@ -40,6 +40,7 @@
           <thead class="bg-custom-primary text-white">
             <tr>
               <th class="border w-2/5 py-2">Item</th>
+              <th class="border w-2/5 py-2">Category</th>
               <th class="border w-1/5 py-2">Quantity</th>
               <th class="border w-1/5 py-2">Status</th>
               <th class="border w-1/5 py-2">Action</th>
@@ -54,6 +55,9 @@
             >
               <td class="border-x text-center py-2 capitalize px-2">
                 <span class="line-clamp-3">{{ item.name }}</span>
+              </td>
+              <td class="border-x text-center py-2 capitalize px-2">
+                <span class="line-clamp-3">{{ item.category || '--' }}</span>
               </td>
               <td class="border-x text-center py-2 capitalize px-2">
                 <span class="line-clamp-3">{{ item.quantity }}</span>
@@ -84,7 +88,7 @@
           </tbody>
           <tbody v-else>
             <tr>
-              <td class="border text-center py-2" colspan="4">
+              <td class="border text-center py-2" colspan="5">
                 No items to show
               </td>
             </tr>

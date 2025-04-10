@@ -7,6 +7,19 @@
                 <input type="text" class="border rounded h-10 p-2" v-model="itemDetails.name">
             </div>
             <div class="flex flex-col gap-y-1 col-span-2">
+                <label >Category<span class="text-custom-primary">*</span></label>
+                <select v-model="itemDetails.category" class="border rounded h-10 p-2">
+                    <option value="" disabled>Select Category</option>
+                    <option>Beds and Mattresses</option>
+                    <option>Bed Linens and Pillows</option>
+                    <option>Towels and Bathrobes</option>
+                    <option>Curtains and Blinds</option>
+                    <option>Furniture</option>
+                    <option>Toiletries</option>
+                    <option>Bathroom Cleaning Supplies</option>
+                </select>
+            </div>
+            <div class="flex flex-col gap-y-1 col-span-2">
                 <label >Quantity <span class="text-custom-primary">*</span></label>
                 <input type="number" class="border rounded h-8 p-2" v-model="itemDetails.quantity">
             </div>
@@ -35,7 +48,8 @@ const closeModal = () => {
 
 const itemDetails = ref({
     name: '',
-    quantity: ''
+    quantity: '',
+    category: ''
 })
 
 // add room
@@ -51,6 +65,7 @@ const addItem = async () => {
     const itemData = {
       name: itemDetails.value.name,
       quantity: itemDetails.value.quantity,
+      category: itemDetails.value.category,
       type,
       createdAt: new Date()
     }
@@ -71,7 +86,8 @@ const addItem = async () => {
 const resetForm = () => {
     itemDetails.value = {
         name: '',
-        quantity: ''
+        quantity: '',
+        category: '',
     }
 }
 
