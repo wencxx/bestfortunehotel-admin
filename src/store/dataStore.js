@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { db } from '../config/firebaseConfig'
-import { onSnapshot, collection, addDoc, getDocs, query, where } from 'firebase/firestore'
+import { onSnapshot, collection, addDoc, getDocs, query, where, orderBy } from 'firebase/firestore'
 
 export const useDataStore = defineStore('dataStore', {
     state: () => ({
@@ -14,7 +14,7 @@ export const useDataStore = defineStore('dataStore', {
         async getBookings() {
             try {
                 onSnapshot(
-                    collection(db, 'booking'),
+                    query(collection(db, 'booking'), orderBy('bookedAt', 'desc')),
                     (snapshot) => {
                         this.bookings = []
                         snapshot.docs.forEach(doc => {

@@ -10,13 +10,7 @@
                 <label >Category<span class="text-custom-primary">*</span></label>
                 <select v-model="itemDetails.category" class="border rounded h-10 p-2">
                     <option value="" disabled>Select Category</option>
-                    <option>Beds and Mattresses</option>
-                    <option>Bed Linens and Pillows</option>
-                    <option>Towels and Bathrobes</option>
-                    <option>Curtains and Blinds</option>
-                    <option>Furniture</option>
-                    <option>Toiletries</option>
-                    <option>Bathroom Cleaning Supplies</option>
+                    <option v-for="category in categories" :key="category.id">{{category.category}}</option>
                 </select>
             </div>
             <div class="flex flex-col gap-y-1 col-span-2">
@@ -33,9 +27,9 @@
 </template>
 
 <script setup>
-import { ref, defineEmits } from 'vue'
+import { ref, defineEmits, onMounted } from 'vue'
 import { db, storage } from '../config/firebaseConfig'
-import { addDoc, collection } from 'firebase/firestore'
+import { addDoc, collection, getDocs } from 'firebase/firestore'
 
 const emit = defineEmits(['closeModal'])
 const { type } = defineProps({
@@ -91,4 +85,26 @@ const resetForm = () => {
     }
 }
 
+const categories = ref([])
+
+// get categories
+const itemsRef = collection(db, 'categories')
+const getItems = async () => {
+    try {
+        const snapshots = await getDocs(itemsRef)
+
+        snapshots.docs.forEach(doc => {
+            categories.value.push({
+                id: doc.id,
+                ...doc.data()
+            })
+        })
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+onMounted(() => {
+  getItems()
+})
 </script>

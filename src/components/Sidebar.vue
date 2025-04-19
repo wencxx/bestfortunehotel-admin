@@ -42,6 +42,10 @@
                 <Icon icon="guidance:cleaning-room" class="text-3xl" />
                 <span class="text-xl">Rooms To Clean</span>
             </router-link>
+            <router-link :to="{ name: 'categories' }" class="flex items-center gap-x-2 px-4 py-3">
+                <Icon icon="material-symbols-light:inventory-rounded" class="text-3xl" />
+                <span class="text-xl">Categories</span>
+            </router-link>
             <router-link :to="{ name: 'inventory' }" class="flex items-center gap-x-2 px-4 py-3">
                 <Icon icon="material-symbols-light:inventory-rounded" class="text-3xl" />
                 <span class="text-xl">Reusable Inventory</span>

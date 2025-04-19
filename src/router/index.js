@@ -82,6 +82,14 @@ const routes = [
         }
     },
     {
+        path: '/categories',
+        name: 'categories',
+        component: () => import('../views/Category.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
+    {
         path: '/reusable-inventory',
         name: 'inventory',
         component: () => import('../views/Inventory.vue'),
